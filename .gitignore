@@ -1,0 +1,84 @@
+# ============================
+# 🌐 GERAL
+# ============================
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.DS_Store
+Thumbs.db
+
+# ============================
+# 🧩 DEPENDÊNCIAS
+# ============================
+# Evita dependências baixadas automaticamente
+**/node_modules/
+**/pnpm-lock.yaml
+
+# ============================
+# ⚙️ FRONTEND (React + TS)
+# ============================
+# Diretórios e arquivos de build
+frontend/.vite/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/coverage/
+frontend/.turbo/
+frontend/.parcel-cache/
+
+# Cache do TypeScript
+frontend/*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
+
+# Cache do ESLint e outros
+frontend/.eslintcache
+
+# ============================
+# 💾 BACKEND (Node.js)
+# ============================
+backend/dist/
+backend/build/
+backend/coverage/
+backend/.tsbuildinfo
+backend/.eslintcache
+
+# ============================
+# 🧪 TESTES
+# ============================
+coverage/
+.nyc_output/
+.vscode-test/
+
+# ============================
+# 🧰 EDITORES
+# ============================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ============================
+# 🐳 DOCKER (se usar)
+# ============================
+docker-compose.override.yml
+.docker/
+*.pid
+
+# ============================
+# 🧠 OUTROS
+# ============================
+# Arquivos temporários do sistema
+*.tmp
+*.temp
+
+# Arquivos de saída locais
+*.local
