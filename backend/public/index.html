@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Vendas — Miniteste 1</title>
+  <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header, footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    main {
+        flex: 1;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    h2, h3 {
+        color: #222;
+    }
+
+    ul {
+        list-style-type: square;
+        margin-left: 1.5rem;
+    }
+
+    p {
+        line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>💼 Sistema de Vendas - Projeto web 2</h1>
+  </header>
+
+  <main>
+    <section id="descricao">
+      <h2>📘 Descrição do Projeto</h2>
+      <p>
+        O projeto representa um sistema simples de <strong>vendas</strong>, no qual <em>usuários</em> podem
+        cadastrar <em>itens</em> e realizar <em>transações</em>.
+      </p>
+    </section>
+
+    <section id="funcionalidades">
+      <h2>Funcionalidades Principais</h2>
+      <ul>
+        <li>Cadastro de usuários com CPF, telefone, email e dados bancários;</li>
+        <li>Cadastro de itens com nome, descrição e preço;</li>
+        <li>Relação entre usuário e itens cadastrados (um usuário pode possuir vários itens);</li>
+        <li>Registro de vendas realizadas por um usuário;</li>
+        <li>Associação de avaliações às vendas, permitindo feedbacks pós-compra.</li>
+      </ul>
+    </section>
+
+    <section id="perguntas">
+      <h2>Perguntas:</h2>
+
+      <h3>1️⃣ Quais são as principais funcionalidades que o sistema deve oferecer?</h3>
+      <p>
+        O sistema deve permitir que os usuários <strong>cadastrem e gerenciem itens</strong>, 
+        realizem <strong>vendas</strong> e possam <strong>avaliar</strong> as transações realizadas.  
+        Também deve oferecer uma interface simples para visualizar produtos, valores e feedbacks.
+      </p>
+
+      <h3>2️⃣ Quais características de qualidade são importantes?</h3>
+      <ul>
+        <li><strong>Usabilidade</strong> — interface simples e intuitiva;</li>
+        <li><strong>Desempenho</strong> — respostas rápidas do servidor;</li>
+        <li><strong>Segurança</strong> — proteção dos dados dos usuários;</li>
+        <li><strong>Escalabilidade</strong> — suporte a futuras expansões;</li>
+        <li><strong>Manutenibilidade</strong> — código claro e organizado.</li>
+      </ul>
+    </section>
+
+    <section id="autores">
+        <h2>👨‍💻 Autores</h2>
+        <p>Antonio Barros de Alcantara Neto</p>
+        <p>Paulo Ricardo Oliveira de Macêdo</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Miniteste 1 — Desenvolvimento Web com Node.js e Express</p>
+  </footer>
+</body>
+</html>
