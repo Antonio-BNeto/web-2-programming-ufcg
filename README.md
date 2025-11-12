@@ -1,4 +1,4 @@
-# 💼 Sistema de Vendas — Projeto Web 2
+# 💼 Sistema de Vendas — Programação para Web 2
 
 ## 📘 Descrição
 
@@ -41,4 +41,4 @@ O servidor será iniciado e o sistema estará pronto para uso.
 - Antonio Barros de Alcantara Neto
 - Paulo  Ricardo Oliveira de Macêdo
 
-Projeto desenvolvido para a disciplina **Projeto Web 2**.
+Projeto desenvolvido para a disciplina **Programação para Web 2**.
