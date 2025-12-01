@@ -32,5 +32,4 @@ export class UserRepository {
 
     return deletedCount > 0;
   }
-
 }
