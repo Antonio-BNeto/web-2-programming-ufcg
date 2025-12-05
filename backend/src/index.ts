@@ -2,15 +2,16 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 import userRoutes from './routes/user.routes';
+import paymentRoutes from './routes/payment.routes';
 import sequelize from './config/database';
 
 const app = express();
 app.use(express.json());
 
-// swagger no link: http://localhost:3000/api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/users', userRoutes);
+app.use('/payments', paymentRoutes);
 
 const PORT = 3000;
 
