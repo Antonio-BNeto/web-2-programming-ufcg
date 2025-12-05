@@ -173,7 +173,7 @@ erDiagram
 
 # 🚀 Como Rodar a Aplicação
 
-## 🐳 Rodando com Docker (RECOMENDADO)
+## 🐳 Rodando com Docker
 
 ### ▶ 1. Iniciar containers
 
@@ -192,38 +192,6 @@ docker compose down
 ``` bash
 docker compose down -v
 docker compose up --build -d
-```
-
-------------------------------------------------------------------------
-
-# 🖥️ Rodando sem Docker
-
-### ▶ 1. Criar `.env`
-
-    DB_DIALECT=postgres
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_USER=seu_usuario
-    DB_PASS=sua_senha
-    DB_NAME=brasa
-
-### ▶ 2. Instalar dependências
-
-``` bash
-npm install
-```
-
-### ▶ 3. Desenvolvimento
-
-``` bash
-npm run dev
-```
-
-### ▶ 4. Produção
-
-``` bash
-npm run build
-npm run start
 ```
 
 ------------------------------------------------------------------------
