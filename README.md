@@ -1,122 +1,83 @@
-# 🛍️ Sistema de Vendas
+# 🛍️ Sistema de Vendas --- Backend
 
-## 📘 Visão Geral do Sistema
+## 📘 Visão Geral da Aplicação
 
-Este projeto representa uma **plataforma de vendas** onde **usuários**
-podem cadastrar itens, realizar vendas, efetuar pagamentos e registrar
-avaliações.
-O modelo foi ampliado para incluir **métodos de pagamento** e suas
-especializações (Pix, Cartão e Conta Bancária), aproximando-se de um
-sistema comercial real.
+Este projeto implementa um **sistema completo de vendas**, composto por:
 
-------------------------------------------------------------------------
+-   Cadastro de **usuários**
+-   Cadastro de **itens**
+-   Registro de **vendas**
+-   Métodos de pagamento (Pix, Cartão, Conta)
+-   Pagamentos vinculados à venda
+-   *Avaliação* como atributo interno da venda (nota e comentário)
 
-## 🧱 Entidades Principais
+A API foi construída usando:
 
-### **1. Usuário**
-
-Representa uma pessoa utilizando o sistema.
-
-**Atributos principais** - id
-- cpf
-- nome
-- telefone
-- senha
-- email
-
-**Relacionamentos** - Possui vários **Métodos de Pagamento** - Realiza
-**Vendas** - Faz **Avaliações**
+-   **Node.js + Express**
+-   **TypeScript**
+-   **Sequelize**
+-   **PostgreSQL**
+-   **Swagger** (documentação automática)
+-   **Docker** (ambiente completo e isolado)
 
 ------------------------------------------------------------------------
 
-### **2. Item**
 
-Produtos cadastrados pelos usuários.
+## 📦 Entidades Principais
 
-**Atributos principais** - id
-- nome
-- descrição
-- preço
+### **Usuário**
 
-**Relacionamentos** - Pode estar em várias vendas (via VENDA_ITEM)
+-   id
+-   cpf
+-   nome
+-   telefone
+-   senha
+-   email
 
-------------------------------------------------------------------------
+### **Item**
 
-### **3. Venda**
+-   id
+-   nome
+-   descricao
+-   preco
 
-Representa uma transação contendo um ou mais itens.
+### **Venda**
 
-**Atributos principais** - id
-- valor_total
-- descrição
-- usuario_id
+-   id
+-   usuario_id
+-   valor_total
+-   descricao
+-   nota_avaliacao
+-   comentario_avaliacao
+-   data_avaliacao
 
-**Relacionamentos** - Inclui itens (VENDA_ITEM)
-- Possui um **Pagamento**
-- Recebe uma **Avaliação**
+### **Pagamento**
 
-------------------------------------------------------------------------
+-   id
+-   venda_id
+-   metodo_pagamento_id
+-   status
+-   data_pagamento
+-   valor
 
-### **4. Pagamento**
+### **Método de Pagamento**
 
-Registra como a venda foi paga.
+-   id
+-   usuario_id
+-   tipo
+-   principal
 
-**Atributos principais** - id
-- venda_id
-- metodo_pagamento_id
-- status
-- data_pagamento
-- valor
+**Especializações:** Pix, Conta Bancária, Cartão
 
-**Relacionamentos** - Vinculado a um **Método de Pagamento** -
-Relacionado a uma **Venda**
+### **VENDA_ITEM**
 
-------------------------------------------------------------------------
-
-### **5. Avaliação**
-
-Feedback do usuário após a venda.
-
-**Atributos principais** - id
-- venda_id
-- usuario_id
-- nota
-- comentario
-- data
-
-**Relacionamentos** - Relacionada a uma **Venda** - Feita por um
-**Usuário**
+-   venda_id
+-   item_id
+-   quantidade
 
 ------------------------------------------------------------------------
 
-## 💳 Métodos de Pagamento
-
-### **Método_Pagamento**
-
-A entidade genérica que representa qualquer forma de pagamento.
-
-**Atributos** - id
-- usuario_id
-- tipo (pix, cartao, conta)
-- principal
-
-**Especializações (1:1):** - **PIX** → chave Pix
-- **CONTA_BANCARIA** → dados bancários
-- **CARTAO** → token, bandeira, últimos dígitos, validade
-
-------------------------------------------------------------------------
-
-## 📦 Tabela Associativa --- VENDA_ITEM
-
-Relaciona itens com vendas, permitindo múltiplos itens por transação.
-
-**Atributos** - venda_id
-- item_id
-- quantidade
-
-------------------------------------------------------------------------
-
-## 📊 Diagrama MER
+## 📊 Diagrama MER Atualizado
 
 ``` mermaid
 erDiagram
@@ -130,18 +91,21 @@ erDiagram
         string email
     }
 
-    VENDA {
-        int id
-        float valor_total
-        string descricao
-        int usuario_id
-    }
-
     ITEM {
         int id
         string nome
         string descricao
         float preco
+    }
+
+    VENDA {
+        int id
+        int usuario_id
+        float valor_total
+        string descricao
+        int nota_avaliacao
+        string comentario_avaliacao
+        date data_avaliacao
     }
 
     VENDA_ITEM {
@@ -168,7 +132,6 @@ erDiagram
 
     PIX {
         int metodo_pagamento_id
-        string tipo
         string chave
     }
 
@@ -191,35 +154,55 @@ erDiagram
         string validade_ano
     }
 
-    AVALIACAO {
-        int id
-        int venda_id
-        int usuario_id
-        int nota
-        string comentario
-        date data
-    }
-
     USUARIO ||--o{ VENDA : realiza
     USUARIO ||--o{ METODO_PAGAMENTO : possui
-    USUARIO ||--o{ AVALIACAO : faz
 
+    VENDA ||--o{ VENDA_ITEM : contem
     VENDA ||--o{ PAGAMENTO : possui
-    VENDA ||--o{ AVALIACAO : recebe
-    VENDA ||--o{ VENDA_ITEM : inclui
 
-    ITEM ||--o{ VENDA_ITEM : pertence
+    ITEM ||--o{ VENDA_ITEM : associado
 
-    METODO_PAGAMENTO ||--|| PIX : tipo_pix
-    METODO_PAGAMENTO ||--|| CONTA_BANCARIA : tipo_conta_bancaria
-    METODO_PAGAMENTO ||--|| CARTAO : tipo_cartao
+    METODO_PAGAMENTO ||--|| PIX : pix
+    METODO_PAGAMENTO ||--|| CONTA_BANCARIA : conta
+    METODO_PAGAMENTO ||--|| CARTAO : cartao
 
     METODO_PAGAMENTO ||--o{ PAGAMENTO : usado_em
 ```
 
-## 👨‍💻 Autores
+------------------------------------------------------------------------
 
-- Antonio Barros de Alcantara Neto
-- Paulo  Ricardo Oliveira de Macêdo
+# 🚀 Como Rodar a Aplicação
 
-Projeto desenvolvido para a disciplina **Programação para Web 2**.
+## 🐳 Rodando com Docker
+
+### ▶ 1. Iniciar containers
+
+``` bash
+docker compose up --build -d
+```
+
+### ▶ 2. Parar
+
+``` bash
+docker compose down
+```
+
+### ▶ 3. Reiniciar completamente
+
+``` bash
+docker compose down -v
+docker compose up --build -d
+```
+
+------------------------------------------------------------------------
+
+# 📚 Documentação da API
+
+👉 http://localhost:3000/api-docs
+
+------------------------------------------------------------------------
+
+# 👨‍💻 Autores
+
+-   Antonio Barros de Alcântara Neto\
+-   Paulo Ricardo Oliveira de Macêdo

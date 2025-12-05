@@ -4,10 +4,12 @@ import { tags } from "./docs/tags";
 import { paymentSchema } from "./docs/schemas/payment.schema";
 import { userSchema } from "./docs/schemas/user.schema";
 import { saleSchema } from "./docs/schemas/sale.schema";
+import { ItemSchema } from "./docs/schemas/Item.schema";
 
 import { paymentPaths } from "./docs/paths/payment.paths";
 import { userPaths } from "./docs/paths/user.paths";
 import { salePaths } from "./docs/paths/sale.paths";
+import { ItemPaths } from "./docs/paths/item.paths";
 
 export const swaggerSpec = swaggerJsdoc({
   definition: {
@@ -21,12 +23,14 @@ export const swaggerSpec = swaggerJsdoc({
       schemas: {
         ...paymentSchema,
         ...userSchema,
+        ...ItemSchema,
         ...saleSchema
       }
     },
     paths: {
       ...paymentPaths,
       ...userPaths,
+      ...ItemPaths,
       ...salePaths
     }
   },
