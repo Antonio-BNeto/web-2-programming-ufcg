@@ -7,6 +7,6 @@ const controller = new PaymentController();
 router.post("/", controller.create.bind(controller));
 router.get("/", controller.findAll.bind(controller));
 router.get("/:id", controller.findById.bind(controller));
-router.put("/:id", controller.update.bind(controller));
+router.patch("/:id", controller.update.bind(controller));
 
 export default router;

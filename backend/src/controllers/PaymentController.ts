@@ -41,11 +41,11 @@ export class PaymentController {
             const id = Number(req.params.id);
             const updated = await repository.update(id, req.body);
 
-            if (!updated) return res.status(404).json({ error: "Payment not found" });
+            if (!updated) return res.status(404).json({ error: "Pagamento não encontrado" });
 
             return res.json(updated);
         } catch (error) {
-            return res.status(400).json({ error: "Failed to update payment" });
+            return res.status(400).json({ error: "Falha na atuallização do pagamento" });
         }
     }
 }
