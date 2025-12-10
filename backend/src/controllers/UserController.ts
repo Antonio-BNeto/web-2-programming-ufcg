@@ -58,19 +58,4 @@ export class UserController {
             return res.status(500).json({ error: error.message });
         }
     }
-
-    async delete(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const deleted = await userRepository.deleteUser(Number(id));
-
-            if (!deleted) {
-                return res.status(404).json({ message: 'Usuário não encontrado' });
-            }
-
-            return res.status(204).send();
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
-    }
 }

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import ItemRepository from "../repository/ItemRepository";
+import { error } from "console";
 
 export class ItemController {
     async create(req: Request, res: Response) {
@@ -26,5 +27,17 @@ export class ItemController {
         const updated = await ItemRepository.update(Number(req.params.id), req.body);
         if (!updated) return res.status(404).json({ message: "Item não encontrado" });
         return res.json(updated);
+    }
+
+    async delete(req: Request, res: Response) {
+        const { id } = req.params;
+
+        const result = await ItemRepository.delete(Number(id));
+
+        if(!result){
+            return res.status(404).json({error: "Item não encontrado"});
+        }
+
+        return res.status(200).json({message: "Item deletado com sucesso"});
     }
 }

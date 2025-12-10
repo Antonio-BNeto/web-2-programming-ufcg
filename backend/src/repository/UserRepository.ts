@@ -24,12 +24,4 @@ export class UserRepository {
 
     return affectedCount > 0;
   }
-
-  async deleteUser(id:number) {
-    const deletedCount = await User.destroy({
-      where: { id }
-    });
-
-    return deletedCount > 0;
-  }
 }

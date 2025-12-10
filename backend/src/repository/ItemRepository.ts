@@ -20,6 +20,17 @@ class ItemRepository {
         await item.update(data);
         return item;
     }
+
+    async delete(id: number) {
+        const item = await Item.findByPk(id);
+
+        if(!item) {
+            return null;
+        }
+
+        await item.destroy();
+        return item;
+    }
 }
 
 export default new ItemRepository();
