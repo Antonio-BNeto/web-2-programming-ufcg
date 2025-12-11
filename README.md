@@ -171,34 +171,74 @@ erDiagram
 
 ------------------------------------------------------------------------
 
-# 🚀 Como Rodar a Aplicação
+# 🚀 Como Rodar a aplicação
 
-## 🐳 Rodando com Docker
+Este projeto funciona **totalmente via Docker**.
+Para executar, você precisa somente dos requisitos abaixo:
 
-### ▶ 1. Iniciar containers
+---
 
-``` bash
+## ✅ 1. Instalar Docker
+
+Você deve ser instalado:
+
+- **Docker**
+- **Docker Compose** (já vem no Docker Desktop)
+
+Download: https://www.docker.com/get-started/
+
+---
+
+## ✅ 2. Baixar o arquivo `.env`
+
+Copie as informações que estão no arquivo `.env` disponibilizado no Drive e coloque-o na **raiz do projeto**, assim:
+
+👉 [**Configuração do .env pelo Google Drive**](https://docs.google.com/document/d/1PLrrIzIwdUIcKQEADiq_qgLgyKe5YtGo/edit?usp=drive_link&ouid=109085909945120972414&rtpof=true&sd=true)
+
+```
+backend
+  |-.env
+  |-docker-compose.yml
+  |-Dockerfile
+  |-src/
+```
+
+Ele contém as variáveis necessárias para o backend conectar ao banco PostgreSQL.
+
+---
+
+## ✅ 3. Rodar o projeto
+
+Execute:
+
+```bash
 docker compose up --build -d
 ```
 
-### ▶ 2. Parar
+O backend ficará disponível em:
 
-``` bash
+👉 http://localhost:3000
+
+Documentação Swagger:
+
+👉 http://localhost:3000/api-docs
+
+---
+
+## 🔄 Parar os containers
+
+```bash
 docker compose down
 ```
 
-### ▶ 3. Reiniciar completamente
+---
 
-``` bash
+## ♻️ Reset completo (inclui banco)
+
+```bash
 docker compose down -v
 docker compose up --build -d
 ```
-
-------------------------------------------------------------------------
-
-# 📚 Documentação da API
-
-👉 http://localhost:3000/api-docs
 
 ------------------------------------------------------------------------
 
