@@ -51,22 +51,5 @@ export const userSchema = {
       name: { type: "string", example: "Antonio Barros" },
       email: { type: "string", format: "email", example: "antonio.barros@email.com" }
     }
-  },
-
-  UserLogin: {
-    type: "object",
-    required: ["email", "password"],
-    properties: {
-      email: {
-        type: "string",
-        format: "email",
-        example: "antonio.barros@email.com"
-      },
-      password: {
-        type: "string",
-        format: "password",
-        example: "SenhaForte@123"
-      }
-    }
   }
 };

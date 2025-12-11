@@ -1,5 +1,4 @@
 export const saleSchema = {
-  // 1. Schema para Criação (POST)
   SaleCreate: {
     type: "object",
     required: ["valueTotal", "description", "userId"],
@@ -22,8 +21,6 @@ export const saleSchema = {
     }
   },
 
-  // 2. Schema para Atualização (PATCH)
-  // Nenhum campo obrigatório, usado para correção de dados
   SaleUpdate: {
     type: "object",
     properties: {
@@ -45,8 +42,6 @@ export const saleSchema = {
     }
   },
 
-  // 3. Schema para Resposta (GET)
-  // Retorna o objeto completo persistido no banco
   SaleResponse: {
     type: "object",
     properties: {
