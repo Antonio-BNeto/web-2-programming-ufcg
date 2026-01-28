@@ -5,13 +5,20 @@ import userRoutes from './routes/user.routes';
 import paymentRoutes from './routes/payment.routes';
 import saleRoutes from './routes/sale.routes';
 import ItemRoutes from './routes/item.routes';
+import authRoutes from './routes/auth.routes';
 import sequelize from './config/database';
+import dotenv from 'dotenv';
+
+
+dotenv.config();
 
 const app = express();
 
 app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use('/auth', authRoutes)
 
 app.use('/users', userRoutes);
 app.use('/payments', paymentRoutes);
