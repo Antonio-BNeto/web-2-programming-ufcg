@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UserRepository } from '../repository/UserRepository';
+import { hashPassword } from '../utils/auth';
 
 const userRepository = new UserRepository();
 
@@ -8,8 +9,14 @@ export class UserController {
     async create(req: Request, res: Response) {
         try {
             const { cpf, phoneNumber, name, email, password } = req.body;
+            const hashedPassword = await hashPassword(password);
+
             const user = await userRepository.createUser({
-                cpf, phoneNumber, name, email, password
+                cpf,
+                phoneNumber,
+                name,
+                email,
+                password: hashedPassword
             });
 
             return res.status(201).json(user);
