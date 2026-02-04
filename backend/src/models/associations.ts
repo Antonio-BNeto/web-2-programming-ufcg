@@ -3,6 +3,7 @@ import User from './User';
 import Sale from './Sale';
 import Item from './Item';
 import Payment from './Payment';
+import SaleItem from './SaleItem';
 
 export const setupAssociations = () => {
     User.hasMany(Sale, { foreignKey: 'userId', as: 'sales' });
@@ -12,16 +13,15 @@ export const setupAssociations = () => {
     Payment.belongsTo(Sale, { foreignKey: 'saleId', as: 'venda' });
 
     Sale.belongsToMany(Item, {
-        through: 'venda_item',
-        foreignKey: 'venda_id',
-        otherKey: 'item_id',
-        as: 'itens'
+        through: SaleItem,
+        as: 'itens',
+        foreignKey: 'saleId'
     });
+
     Item.belongsToMany(Sale, {
-        through: 'venda_item',
-        foreignKey: 'item_id',
-        otherKey: 'venda_id',
-        as: 'vendas'
+        through: SaleItem,
+        as: 'vendas',
+        foreignKey: 'itemId'
     });
 };
 

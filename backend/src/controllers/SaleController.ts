@@ -1,19 +1,12 @@
 import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Response, Tags, Security, Request } from "tsoa";
-import SaleRepository from "../repository/SaleRepository";
 import { ErrorResponse, MessageResponse } from "../types/responses";
 import { AuthenticatedRequest } from "../types/auth";
 import SaleService from "../services/SaleService";
 import Sale from "../models/Sale";
 import User from "../models/User";
+import Item from "../models/Item";
+import { SaleCreateRequest } from "../dto/Sale.dto";
 
-interface SaleCreateRequest {
-  /** @example 250.75 */
-  valueTotal: number;
-  /** @example "Venda de periféricos gamer" */
-  description: string;
-  /** Array de itens contendo ID e quantidade */
-  items: { itemId: number, quantity: number }[];
-}
 
 interface SaleResponse {
   id: number;
@@ -30,17 +23,16 @@ export class SaleController extends Controller {
   @Security("jwt")
   @SuccessResponse(201, "Venda criada com sucesso")
   public async create(
-    @Body() requestBody: { valueTotal: number, description: string, items: { itemId: number, quantity: number }[] },
+    @Body() requestBody: SaleCreateRequest,
     @Request() request: AuthenticatedRequest
   ): Promise<SaleResponse | ErrorResponse> {
     try {
       const userId = request.user.id;
 
-      const sale = await SaleService.createSale({
-                valueTotal: requestBody.valueTotal,
-                description: requestBody.description,
-                userId: userId
-            }, requestBody.items);
+      const sale = await SaleService.createSale(
+        userId,
+        requestBody.description,
+        requestBody.items);
 
       this.setStatus(201)
       return sale.get({ plain: true }) as SaleResponse;
@@ -51,21 +43,28 @@ export class SaleController extends Controller {
   }
 
   @Get()
-@Security("jwt")
-public async getAll(@Request() request: AuthenticatedRequest): Promise<any[]> {
-  const userId = request.user.id;
+  @Security("jwt")
+  public async getAll(@Request() request: AuthenticatedRequest): Promise<any[]> {
+    const userId = request.user.id;
 
-  const sales = await Sale.findAll({
-    where: { userId },
-    include: [{
-      model: User,
-      as: 'vendedor',
-      attributes: ['name', 'email']
-    }]
-  });
+    const sales = await Sale.findAll({
+      where: { userId },
+      include: [
+        {
+          model: User,
+          as: 'vendedor',
+          attributes: ['name', 'email']
+        },
+        {
+          model: Item,
+          as: 'itens', // Nome definido na associação 'as'
+          through: { attributes: ['quantity', 'unitPrice'] } // Atributos da tabela intermediária
+        }
+      ]
+    });
 
-  return sales;
-}
+    return sales;
+  }
 
   @Get("{id}")
   @Security("jwt")
@@ -73,10 +72,16 @@ public async getAll(@Request() request: AuthenticatedRequest): Promise<any[]> {
   public async getById(
     @Path() id: number,
     @Request() request: AuthenticatedRequest
-  ): Promise<SaleResponse | MessageResponse> {
+  ): Promise<any | MessageResponse> {
     try {
-      const sale = await SaleService.validateOwnership(id, request.user.id);
-      return sale.get({ plain: true }) as SaleResponse;
+      const sale = await Sale.findOne({
+        where: { id, userId: request.user.id },
+        include: [{ model: Item, as: 'itens', through: { attributes: ['quantity', 'unitPrice'] } }]
+      });
+
+      if (!sale) throw new Error("Venda não encontrada.");
+
+      return sale.get({ plain: true });
     } catch (err: any) {
       this.setStatus(404);
       return { message: err.message };
