@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
+    "swagger": "tsoa spec",
+    "dev": "tsoa spec && ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsoa spec && tsc",
     "start": "node dist/index.js"
   },
   "keywords": [],
@@ -20,7 +21,8 @@
     "pg": "^8.16.3",
     "sequelize": "^6.37.7",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "tsoa": "^7.0.0-alpha.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

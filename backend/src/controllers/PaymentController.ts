@@ -1,51 +1,80 @@
-import { Request, Response } from "express";
+import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Response, Tags } from "tsoa";
 import { PaymentRepository } from "../repository/PaymentRepository";
+import { ErrorResponse, MessageResponse } from "../types/responses";
 
 const repository = new PaymentRepository();
 
-export class PaymentController {
+/**
+ * Interface sincronizada para documentação automática
+ */
+interface PaymentRequest {
+  /** @example 1 */
+  saleId: number;
+  /** @example "PENDING" */
+  status: string;
+  /** @example 150.50 */
+  value: number;
+  /** @example "2026-02-03T23:00:00Z" */
+  paymentDate?: Date | null;
+}
 
-    async create(req: Request, res: Response) {
-        try {
-            const payment = await repository.create(req.body);
-            return res.status(201).json(payment);
-        } catch (error) {
-            return res.status(400).json({ error: "Failed to create payment", details: error });
-        }
+interface PaymentResponse extends PaymentRequest {
+  id: number;
+}
+
+@Route("payments")
+@Tags("Pagamentos")
+export class PaymentController extends Controller {
+
+  @Post()
+  @SuccessResponse(201, "Criado com sucesso")
+  @Response<ErrorResponse>(400, "Falha na criação")
+  public async create(@Body() requestBody: PaymentRequest): Promise<PaymentResponse | ErrorResponse | MessageResponse> {
+    try {
+      const payment = await repository.create(requestBody);
+      this.setStatus(201);
+      return payment as unknown as PaymentResponse;
+    } catch (error) {
+      this.setStatus(400);
+      return { message: "Failed to create payment", error };
     }
+  }
 
-    async findAll(req: Request, res: Response) {
-        try {
-            const payments = await repository.findAll();
-            return res.json(payments);
-        } catch (error) {
-            return res.status(500).json({ error: "Failed to fetch payments" });
-        }
+  @Get()
+  public async findAll(): Promise<PaymentResponse[]> {
+    const payments = await repository.findAll();
+    return payments as unknown as PaymentResponse[];
+  }
+
+  @Get("{id}")
+  @Response<ErrorResponse>(404, "Não encontrado")
+  public async findById(@Path() id: number): Promise<PaymentResponse | ErrorResponse> {
+    const payment = await repository.findById(id);
+    if (!payment) {
+      this.setStatus(404);
+      return { message: "Payment not found" };
     }
+    return payment as unknown as PaymentResponse;
+  }
 
-    async findById(req: Request, res: Response) {
-        try {
-            const id = Number(req.params.id);
-            const payment = await repository.findById(id);
-
-            if (!payment) return res.status(404).json({ error: "Payment not found" });
-
-            return res.json(payment);
-        } catch (error) {
-            return res.status(500).json({ error: "Failed to fetch payment" });
-        }
+  @Put("{id}")
+  @SuccessResponse(200, "Atualizado com sucesso")
+  @Response<ErrorResponse>(404, "Não encontrado")
+  @Response<ErrorResponse>(400, "Erro na atualização")
+  public async update(
+    @Path() id: number,
+    @Body() requestBody: PaymentRequest
+  ): Promise<PaymentResponse | ErrorResponse> {
+    try {
+      const updated = await repository.update(id, requestBody);
+      if (!updated) {
+        this.setStatus(404);
+        return { message: "Pagamento não encontrado" };
+      }
+      return updated as unknown as PaymentResponse;
+    } catch (error) {
+      this.setStatus(400);
+      return { message: "Falha na atualização do pagamento", error };
     }
-
-    async update(req: Request, res: Response) {
-        try {
-            const id = Number(req.params.id);
-            const updated = await repository.update(id, req.body);
-
-            if (!updated) return res.status(404).json({ error: "Pagamento não encontrado" });
-
-            return res.json(updated);
-        } catch (error) {
-            return res.status(400).json({ error: "Falha na atuallização do pagamento" });
-        }
-    }
+  }
 }

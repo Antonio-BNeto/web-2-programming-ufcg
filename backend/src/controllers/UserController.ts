@@ -1,68 +1,84 @@
-import { Request, Response } from 'express';
+import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Response, Tags } from "tsoa";
 import { UserRepository } from '../repository/UserRepository';
 import { hashPassword } from '../utils/auth';
+import { ErrorResponse, MessageResponse } from "../types/responses";
 
 const userRepository = new UserRepository();
 
-export class UserController {
+// Interfaces para documentação e prototipagem
+interface UserRequest {
+  /** @example "123.456.789-00" */
+  cpf: string;
+  /** @example "(83) 99999-9999" */
+  phoneNumber: string;
+  /** @example "Usuário" */
+  name: string;
+  /** @example "usuario@email.com" */
+  email: string;
+  /** @example "senhaSegura123" */
+  password?: string;
+}
 
-    async create(req: Request, res: Response) {
-        try {
-            const { cpf, phoneNumber, name, email, password } = req.body;
-            const hashedPassword = await hashPassword(password);
+interface UserResponse extends Omit<UserRequest, 'password'> {
+  id: number;
+}
 
-            const user = await userRepository.createUser({
-                cpf,
-                phoneNumber,
-                name,
-                email,
-                password: hashedPassword
-            });
+@Route("users")
+@Tags("Usuários")
+export class UserController extends Controller {
 
-            return res.status(201).json(user);
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
+  @Post()
+  @SuccessResponse(201, "Criado com sucesso")
+  public async create(@Body() requestBody: UserRequest): Promise<UserResponse | ErrorResponse> {
+    try {
+      const { password, ...rest } = requestBody;
+      const hashedPassword = await hashPassword(password!);
+
+      const user = await userRepository.createUser({
+        ...rest,
+        password: hashedPassword
+      });
+
+      this.setStatus(201);
+      return user as unknown as UserResponse;
+    } catch (error: any) {
+      this.setStatus(500);
+      return { message: "Erro ao criar usuário", error: error.message };
     }
+  }
 
-    async getAll(req: Request, res: Response) {
-        try {
-            const users = await userRepository.getAllUsers();
-            return res.status(200).json(users);
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
+  @Get()
+  public async getAll(): Promise<UserResponse[]> {
+    const users = await userRepository.getAllUsers();
+    return users as unknown as UserResponse[];
+  }
+
+  @Get("{id}")
+  @Response<MessageResponse>(404, "Não encontrado")
+  public async getById(@Path() id: number): Promise<UserResponse | MessageResponse> {
+    const user = await userRepository.getUserById(id);
+    if (!user) {
+      this.setStatus(404);
+      return { message: "Usuário não encontrado" };
     }
+    return user as unknown as UserResponse;
+  }
 
-    async getById(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const user = await userRepository.getUserById(Number(id));
+  @Put("{id}")
+  @Response<MessageResponse>(404, "Não encontrado")
+  public async update(@Path() id: number, @Body() requestBody: Partial<UserRequest>): Promise<MessageResponse | ErrorResponse> {
+    try {
+      const updated = await userRepository.updateUser(id, requestBody);
 
-            if (!user) {
-                return res.status(404).json({ message: 'Usuário não encontrado' });
-            }
+      if (!updated) {
+        this.setStatus(404);
+        return { message: "Usuário não encontrado ou dados iguais" };
+      }
 
-            return res.status(200).json(user);
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
+      return { message: "Usuário atualizado com sucesso" };
+    } catch (error: any) {
+      this.setStatus(500);
+      return { message: "Erro ao atualizar usuário", error: error.message };
     }
-
-    async update(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const data = req.body;
-
-            const updated = await userRepository.updateUser(Number(id), data);
-
-            if (!updated) {
-                return res.status(404).json({ message: 'Usuário não encontrado ou dados iguais' });
-            }
-
-            return res.status(200).json({ message: 'Usuário atualizado com sucesso' });
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
-    }
+  }
 }

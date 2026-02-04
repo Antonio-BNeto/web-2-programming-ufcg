@@ -1,30 +1,63 @@
-import { Request, Response } from "express";
+import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Response, Tags } from "tsoa";
 import SaleRepository from "../repository/SaleRepository";
+import { ErrorResponse, MessageResponse } from "../types/responses";
 
-export class SaleController {
-    async create(req: Request, res: Response) {
-        try {
-            const sale = await SaleRepository.create(req.body);
-            return res.status(201).json(sale);
-        } catch (err: any) {
-            return res.status(500).json({ error: err.message });
-        }
-    }
+// Interfaces baseadas no seu SaleAttributes
+interface SaleRequest {
+  /** @example 250.75 */
+  valueTotal: number;
+  /** @example "Venda de periféricos gamer" */
+  description: string;
+  /** @example 1 */
+  userId: number;
+}
 
-    async getAll(req: Request, res: Response) {
-        const sales = await SaleRepository.findAll();
-        return res.json(sales);
-    }
+interface SaleResponse extends SaleRequest {
+  id: number;
+}
 
-    async getById(req: Request, res: Response) {
-        const sale = await SaleRepository.findById(Number(req.params.id));
-        if (!sale) return res.status(404).json({ message: "Venda não encontrada" });
-        return res.json(sale);
-    }
+@Route("sales")
+@Tags("Vendas")
+export class SaleController extends Controller {
 
-    async update(req: Request, res: Response) {
-        const updated = await SaleRepository.update(Number(req.params.id), req.body);
-        if (!updated) return res.status(404).json({ message: "Venda não encontrada" });
-        return res.json(updated);
+  @Post()
+  @SuccessResponse(201, "Venda criada com sucesso")
+  public async create(@Body() requestBody: SaleRequest): Promise<SaleResponse | ErrorResponse> {
+    try {
+      const sale = await SaleRepository.create(requestBody);
+      this.setStatus(201);
+      return sale as unknown as SaleResponse;
+    } catch (err: any) {
+      this.setStatus(500);
+      return { message: "Erro ao criar venda", error: err.message };
     }
+  }
+
+  @Get()
+  public async getAll(): Promise<SaleResponse[]> {
+    const sales = await SaleRepository.findAll();
+    return sales as unknown as SaleResponse[];
+  }
+
+  @Get("{id}")
+  @Response<MessageResponse>(404, "Venda não encontrada")
+  public async getById(@Path() id: number): Promise<SaleResponse | MessageResponse> {
+    const sale = await SaleRepository.findById(id);
+    if (!sale) {
+      this.setStatus(404);
+      return { message: "Venda não encontrada" };
+    }
+    return sale as unknown as SaleResponse;
+  }
+
+  @Put("{id}")
+  @Response<MessageResponse>(404, "Venda não encontrada")
+  public async update(@Path() id: number, @Body() requestBody: SaleRequest): Promise<SaleResponse | MessageResponse> {
+    const updated = await SaleRepository.update(id, requestBody);
+    if (!updated) {
+      this.setStatus(404);
+      return { message: "Venda não encontrada" };
+    }
+    return updated as unknown as SaleResponse;
+  }
 }

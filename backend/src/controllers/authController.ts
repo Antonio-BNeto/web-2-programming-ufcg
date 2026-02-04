@@ -1,26 +1,58 @@
-import { Request, Response } from 'express';
+import { Controller, Post, Route, Body, SuccessResponse, Response, Tags } from "tsoa";
 import { comparePassword, generateToken } from '../utils/auth';
 import { User } from '../models/User';
+import { ErrorResponse, MessageResponse } from '../types/responses';
 
-export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+// Interfaces que definem o contrato e geram a documentação
+interface LoginRequest {
+  /** @example "usuario@brasa.com" */
+  email: string;
+  /** @example "Teste123" */
+  password: string;
+}
 
-  try {
-    const user = await User.findOne({ where: { email } });
+interface LoginResponse {
+  message: string;
+  token: string;
+}
 
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+@Route("auth")
+@Tags("Autenticação")
+export class AuthController extends Controller {
+
+  /**
+   * Realiza a autenticação do usuário e retorna um token JWT.
+   */
+  @Post("login")
+  @SuccessResponse(200, "Login efetuado com sucesso")
+  @Response<ErrorResponse>(400, "Credenciais inválidas")
+  @Response<ErrorResponse>(500, "Erro interno do servidor")
+  public async login(@Body() body: LoginRequest): Promise<LoginResponse | MessageResponse | ErrorResponse> {
+    const { email, password } = body;
+
+    try {
+      const user = await User.findOne({ where: { email } });
+
+      if (!user) {
+        this.setStatus(400);
+        return { message: 'Invalid email or password' };
+      }
+
+      const isPasswordValid = await comparePassword(password, user.password);
+      if (!isPasswordValid) {
+        this.setStatus(400);
+        return { message: 'Invalid email or password' };
+      }
+
+      const token = generateToken(user.id, user.email);
+
+      return {
+        message: 'Login successful',
+        token
+      };
+    } catch (err) {
+      this.setStatus(500);
+      return { message: 'Error logging in', error: err };
     }
-
-    const isPasswordValid = await comparePassword(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
-
-    const token = generateToken(user.id, user.email);
-
-    res.status(200).json({ message: 'Login successful', token });
-  } catch (err) {
-    res.status(500).json({ message: 'Error logging in', error: err });
   }
-};
+}

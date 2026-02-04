@@ -1,43 +1,38 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from './config/swagger';
-import userRoutes from './routes/user.routes';
-import paymentRoutes from './routes/payment.routes';
-import saleRoutes from './routes/sale.routes';
-import ItemRoutes from './routes/item.routes';
-import authRoutes from './routes/auth.routes';
 import sequelize from './config/database';
 import dotenv from 'dotenv';
-
 
 dotenv.config();
 
 const app = express();
-
 app.use(express.json());
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Função de configuração movida para garantir execução antes do listen
+const setupApp = async () => {
+  try {
+    const swaggerDocument = await import('./swagger/swagger.json');
+    const { RegisterRoutes } = await import('./swagger/routes');
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use('/auth', authRoutes)
+    RegisterRoutes(app);
 
-app.use('/users', userRoutes);
-app.use('/payments', paymentRoutes);
-app.use('/sales', saleRoutes);
-app.use('/items', ItemRoutes);
-
+    console.log("✅ Rotas e Swagger carregados via TSOA");
+  } catch (err) {
+    console.error("⚠️ Erro ao carregar Swagger/Rotas:", err);
+  }
+};
 
 const PORT = process.env.PORT || 3000;
 
 sequelize
   .authenticate()
-  .then(() => {
+  .then(async () => {
     console.log('💾 Banco conectado com sucesso!');
-
+    await setupApp();
     return sequelize.sync();
   })
   .then(() => {
-    console.log('📦 Models sincronizados.');
-
     app.listen(PORT, () => {
       console.log(`🚀 Servidor rodando na porta ${PORT}`);
       console.log(`📄 Swagger: http://localhost:${PORT}/api-docs`);
