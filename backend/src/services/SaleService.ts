@@ -1,44 +1,60 @@
-import { SaleCreationAttributes } from "../models/Sale";
-import ItemRepository from "../repository/ItemRepository";
+import sequelize from "../config/database";
+import Item from "../models/Item";
+import Sale, { SaleCreationAttributes } from "../models/Sale";
+import SaleItem from "../models/SaleItem";
 import SaleRepository from "../repository/SaleRepository";
 
 class SaleService {
 
 
-    async createSale(
-        saleData: SaleCreationAttributes,
-        items: {itemId: number, quantity: number}[]
-    ) {
-        let calculatedTotal = 0;
+    public async createSale(userId: number, description: string, itemsData: { itemId: number, quantity: number }[]) {
+        const transaction = await sequelize.transaction();
 
-        for(const entry of items) {
-            const item = await ItemRepository.findById(entry.itemId);
+        try {
+            let calculatedTotal = 0;
+            const itemsToProcess = [];
 
-            if (!item) {
-                throw new Error(`Item com ID ${entry.itemId} não encontrado.`);
+            for (const itemRef of itemsData) {
+                const item = await Item.findByPk(itemRef.itemId, { transaction });
+
+                if (!item) throw new Error(`Item com ID ${itemRef.itemId} não encontrado.`);
+                if (item.quantity < itemRef.quantity) throw new Error(`Estoque insuficiente para o item ${item.name}.`);
+
+                calculatedTotal += item.price * itemRef.quantity;
+
+                itemsToProcess.push({
+                    model: item,
+                    quantity: itemRef.quantity,
+                    unitPrice: item.price
+                });
             }
 
-            if (item.quantity< entry.quantity) {
-                throw new Error(`Estoque insuficiente para o item: ${item.name}. Disponível: ${item.quantity}`);
+            const sale = await Sale.create({
+                valueTotal: calculatedTotal,
+                description,
+                userId
+            }, { transaction });
+
+            for (const itemData of itemsToProcess) {
+                await SaleItem.create({
+                    saleId: sale.id,
+                    itemId: itemData.model.id,
+                    quantity: itemData.quantity,
+                    unitPrice: itemData.unitPrice
+                }, { transaction });
+
+                await itemData.model.update(
+                    { quantity: itemData.model.quantity - itemData.quantity },
+                    { transaction }
+                );
             }
 
-            calculatedTotal += item.price * entry.quantity;
+            await transaction.commit();
+            return sale;
+        } catch (err) {
+            await transaction.rollback();
+            throw err;
         }
-
-        if (Math.abs(calculatedTotal - saleData.valueTotal) > 0.01) {
-            throw new Error("O valor total da venda diverge da soma dos itens.");
-        }
-
-        const newSale = await SaleRepository.create(saleData);
-
-        for (const entry of items) {
-            const item = await ItemRepository.findById(entry.itemId);
-            if (item) {
-                await item.update({ quantity: item.quantity - entry.quantity });
-            }
-        }
-
-        return newSale;
     }
 
     async getSalesByUser(userId: number) {
@@ -54,11 +70,11 @@ class SaleService {
         const sale = await SaleRepository.findById(saleId);
 
         if (!sale) {
-        throw new Error("Venda não encontrada.");
+            throw new Error("Venda não encontrada.");
         }
 
         if (sale.userId !== userId) {
-        throw new Error("Acesso negado: Você não tem permissão para alterar esta venda.");
+            throw new Error("Acesso negado: Você não tem permissão para alterar esta venda.");
         }
 
         return sale;
