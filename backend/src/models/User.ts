@@ -1,5 +1,6 @@
 import {Model, DataTypes, Optional} from 'sequelize';
 import sequelize from '../config/database';
+import Sale from './Sale';
 
 export interface UserAttributes {
     id: number;
@@ -13,7 +14,7 @@ export interface UserAttributes {
 export interface UserCreationAttributes
     extends Optional<UserAttributes, "id"> {}
 
-export class User
+class User
     extends Model<UserAttributes, UserCreationAttributes>
     implements UserAttributes
 {
@@ -62,3 +63,5 @@ User.init(
         timestamps: false
     }
 )
+
+export default User;

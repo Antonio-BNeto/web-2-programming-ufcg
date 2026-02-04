@@ -12,7 +12,7 @@ export interface PaymentAttributes {
 export interface PaymentCreationAttributes
     extends Optional<PaymentAttributes, "id" | "paymentDate"> {}
 
-export class Payment
+class Payment
     extends Model<PaymentAttributes, PaymentCreationAttributes>
     implements PaymentAttributes
 {
@@ -55,3 +55,6 @@ Payment.init(
         timestamps: false
     }
 );
+
+
+export default Payment;

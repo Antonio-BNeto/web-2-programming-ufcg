@@ -1,5 +1,4 @@
-import { where } from "sequelize";
-import { User, UserCreationAttributes } from "../models/User";
+import User, { UserCreationAttributes } from "../models/User";
 
 export class UserRepository {
 

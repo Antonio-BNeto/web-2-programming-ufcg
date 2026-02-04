@@ -1,10 +1,11 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
+import User from "./User";
 
 export interface SaleAttributes {
     id: number;
     valueTotal: number;
-    description: String;
+    description: string;
     userId: number;
 }
 
@@ -17,7 +18,7 @@ export class Sale
 {
     public id!: number;
     public valueTotal!: number;
-    public description!: String;
+    public description!: string;
     public userId!: number;
 }
 
