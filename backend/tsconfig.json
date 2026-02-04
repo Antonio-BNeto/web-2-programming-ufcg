@@ -6,7 +6,11 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "verbatimModuleSyntax": false,
     "skipLibCheck": true
   }
