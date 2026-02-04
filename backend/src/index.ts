@@ -3,10 +3,7 @@ import swaggerUi from 'swagger-ui-express';
 import sequelize from './config/database';
 import dotenv from 'dotenv';
 
-import './models/User';
-import './models/Item';
-import './models/Payment';
-import './models/Sale';
+import './models';
 
 dotenv.config();
 
