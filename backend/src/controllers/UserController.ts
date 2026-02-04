@@ -5,7 +5,6 @@ import { ErrorResponse, MessageResponse } from "../types/responses";
 
 const userRepository = new UserRepository();
 
-// Interfaces para documentação e prototipagem
 interface UserRequest {
   /** @example "123.456.789-00" */
   cpf: string;

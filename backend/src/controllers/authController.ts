@@ -1,13 +1,12 @@
 import { Controller, Post, Route, Body, SuccessResponse, Response, Tags } from "tsoa";
 import { comparePassword, generateToken } from '../utils/auth';
-import { User } from '../models/User';
+import User from '../models/User';
 import { ErrorResponse, MessageResponse } from '../types/responses';
 
-// Interfaces que definem o contrato e geram a documentação
 interface LoginRequest {
-  /** @example "usuario@brasa.com" */
+  /** @example "usuario@email.com" */
   email: string;
-  /** @example "Teste123" */
+  /** @example "senhaSegura123" */
   password: string;
 }
 

@@ -6,10 +6,18 @@
     "outputDirectory": "src/swagger",
     "specVersion": 3,
     "title": "Sales API",
-    "description": "API do sistema de vendas com geração automática via TSOA"
+    "description": "API do sistema de vendas com geração automática via TSOA",
+    "securityDefinitions": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
   },
   "routes": {
     "routesDir": "src/swagger",
-    "basePath" : "/"
+    "basePath": "/",
+    "authenticationModule": "src/auth/authentication.ts"
   }
 }

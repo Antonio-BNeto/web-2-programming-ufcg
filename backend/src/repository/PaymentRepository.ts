@@ -1,4 +1,4 @@
-import { Payment, PaymentAttributes, PaymentCreationAttributes } from "../models/Payment";
+import Payment, {PaymentAttributes, PaymentCreationAttributes } from "../models/Payment";
 
 export class PaymentRepository {
     async create(data: PaymentCreationAttributes): Promise<Payment> {

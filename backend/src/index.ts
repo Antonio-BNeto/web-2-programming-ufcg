@@ -3,12 +3,16 @@ import swaggerUi from 'swagger-ui-express';
 import sequelize from './config/database';
 import dotenv from 'dotenv';
 
+import './models/User';
+import './models/Item';
+import './models/Payment';
+import './models/Sale';
+
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-// Função de configuração movida para garantir execução antes do listen
 const setupApp = async () => {
   try {
     const swaggerDocument = await import('./swagger/swagger.json');
@@ -29,7 +33,10 @@ sequelize
   .authenticate()
   .then(async () => {
     console.log('💾 Banco conectado com sucesso!');
+
     await setupApp();
+
+
     return sequelize.sync();
   })
   .then(() => {

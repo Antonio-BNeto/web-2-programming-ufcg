@@ -1,0 +1,1245 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"LoginResponse": {
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"message",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MessageResponse": {
+				"properties": {
+					"message": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ErrorResponse": {
+				"properties": {
+					"message": {
+						"type": "string"
+					},
+					"error": {}
+				},
+				"required": [
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LoginRequest": {
+				"properties": {
+					"email": {
+						"type": "string",
+						"example": "usuario@email.com"
+					},
+					"password": {
+						"type": "string",
+						"example": "senhaSegura123"
+					}
+				},
+				"required": [
+					"email",
+					"password"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_UserRequest.Exclude_keyofUserRequest.password__": {
+				"properties": {
+					"cpf": {
+						"type": "string",
+						"example": "123.456.789-00"
+					},
+					"phoneNumber": {
+						"type": "string",
+						"example": "(83) 99999-9999"
+					},
+					"name": {
+						"type": "string",
+						"example": "Usuário"
+					},
+					"email": {
+						"type": "string",
+						"example": "usuario@email.com"
+					}
+				},
+				"required": [
+					"cpf",
+					"phoneNumber",
+					"name",
+					"email"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"UserResponse": {
+				"properties": {
+					"cpf": {
+						"type": "string",
+						"example": "123.456.789-00"
+					},
+					"phoneNumber": {
+						"type": "string",
+						"example": "(83) 99999-9999"
+					},
+					"name": {
+						"type": "string",
+						"example": "Usuário"
+					},
+					"email": {
+						"type": "string",
+						"example": "usuario@email.com"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"cpf",
+					"phoneNumber",
+					"name",
+					"email",
+					"id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserRequest": {
+				"properties": {
+					"cpf": {
+						"type": "string",
+						"example": "123.456.789-00"
+					},
+					"phoneNumber": {
+						"type": "string",
+						"example": "(83) 99999-9999"
+					},
+					"name": {
+						"type": "string",
+						"example": "Usuário"
+					},
+					"email": {
+						"type": "string",
+						"example": "usuario@email.com"
+					},
+					"password": {
+						"type": "string",
+						"example": "senhaSegura123"
+					}
+				},
+				"required": [
+					"cpf",
+					"phoneNumber",
+					"name",
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_UserRequest_": {
+				"properties": {
+					"cpf": {
+						"type": "string",
+						"example": "123.456.789-00"
+					},
+					"phoneNumber": {
+						"type": "string",
+						"example": "(83) 99999-9999"
+					},
+					"name": {
+						"type": "string",
+						"example": "Usuário"
+					},
+					"email": {
+						"type": "string",
+						"example": "usuario@email.com"
+					},
+					"password": {
+						"type": "string",
+						"example": "senhaSegura123"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"SaleResponse": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"valueTotal": {
+						"type": "number",
+						"format": "double"
+					},
+					"description": {
+						"type": "string"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"id",
+					"valueTotal",
+					"description",
+					"userId"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_Omit_SaleCreateRequest.items__": {
+				"properties": {
+					"valueTotal": {
+						"type": "number",
+						"format": "double",
+						"example": 250.75
+					},
+					"description": {
+						"type": "string",
+						"example": "Venda de periféricos gamer"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"PaymentResponse": {
+				"properties": {
+					"saleId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"status": {
+						"type": "string",
+						"example": "PENDING"
+					},
+					"value": {
+						"type": "number",
+						"format": "double",
+						"example": 150.5
+					},
+					"paymentDate": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true,
+						"example": "2026-02-03T23:00:00Z"
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"saleId",
+					"status",
+					"value",
+					"id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PaymentRequest": {
+				"properties": {
+					"saleId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"status": {
+						"type": "string",
+						"example": "PENDING"
+					},
+					"value": {
+						"type": "number",
+						"format": "double",
+						"example": 150.5
+					},
+					"paymentDate": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true,
+						"example": "2026-02-03T23:00:00Z"
+					}
+				},
+				"required": [
+					"saleId",
+					"status",
+					"value"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ItemResponse": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"example": "Teclado Mecânico"
+					},
+					"description": {
+						"type": "string",
+						"example": "Teclado RGB switch blue"
+					},
+					"price": {
+						"type": "number",
+						"format": "double",
+						"example": 250.5
+					},
+					"quantity": {
+						"type": "number",
+						"format": "double",
+						"example": 10
+					},
+					"id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"name",
+					"description",
+					"price",
+					"quantity",
+					"id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ItemRequest": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"example": "Teclado Mecânico"
+					},
+					"description": {
+						"type": "string",
+						"example": "Teclado RGB switch blue"
+					},
+					"price": {
+						"type": "number",
+						"format": "double",
+						"example": 250.5
+					},
+					"quantity": {
+						"type": "number",
+						"format": "double",
+						"example": 10
+					}
+				},
+				"required": [
+					"name",
+					"description",
+					"price",
+					"quantity"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {
+			"jwt": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		}
+	},
+	"info": {
+		"title": "backend",
+		"version": "1.0.0",
+		"description": "API do sistema de vendas com geração automática via TSOA",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/auth/login": {
+			"post": {
+				"operationId": "Login",
+				"responses": {
+					"200": {
+						"description": "Login efetuado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/LoginResponse"
+										},
+										{
+											"$ref": "#/components/schemas/MessageResponse"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Credenciais inválidas",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Erro interno do servidor",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"description": "Realiza a autenticação do usuário e retorna um token JWT.",
+				"tags": [
+					"Autenticação"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LoginRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"201": {
+						"description": "Criado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/UserResponse"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Usuários"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserRequest"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/UserResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Usuários"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/users/{id}": {
+			"get": {
+				"operationId": "GetById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/UserResponse"
+										},
+										{
+											"$ref": "#/components/schemas/MessageResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Usuários"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "Update",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/MessageResponse"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Usuários"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Partial_UserRequest_"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/sales": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"201": {
+						"description": "Venda criada com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/SaleResponse"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Vendas"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"items": {
+										"items": {
+											"properties": {
+												"quantity": {
+													"type": "number",
+													"format": "double"
+												},
+												"itemId": {
+													"type": "number",
+													"format": "double"
+												}
+											},
+											"required": [
+												"quantity",
+												"itemId"
+											],
+											"type": "object"
+										},
+										"type": "array"
+									},
+									"description": {
+										"type": "string"
+									},
+									"valueTotal": {
+										"type": "number",
+										"format": "double"
+									}
+								},
+								"required": [
+									"items",
+									"description",
+									"valueTotal"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Vendas"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/sales/{id}": {
+			"get": {
+				"operationId": "GetById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/SaleResponse"
+										},
+										{
+											"$ref": "#/components/schemas/MessageResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Venda não encontrada",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Vendas"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "Update",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/SaleResponse"
+										},
+										{
+											"$ref": "#/components/schemas/MessageResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Venda não encontrada ou acesso negado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Vendas"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Partial_Omit_SaleCreateRequest.items__"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/payments": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"201": {
+						"description": "Criado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/PaymentResponse"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										},
+										{
+											"$ref": "#/components/schemas/MessageResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Falha na criação",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PaymentRequest"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "FindAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/PaymentResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/payments/{id}": {
+			"get": {
+				"operationId": "FindById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/PaymentResponse"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "Update",
+				"responses": {
+					"200": {
+						"description": "Atualizado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/PaymentResponse"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Erro na atualização",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PaymentRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/items": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"201": {
+						"description": "Criado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/ItemResponse"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Itens"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ItemRequest"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/ItemResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Itens"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/items/{id}": {
+			"get": {
+				"operationId": "GetById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/ItemResponse"
+										},
+										{
+											"$ref": "#/components/schemas/MessageResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Itens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"put": {
+				"operationId": "Update",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/ItemResponse"
+										},
+										{
+											"$ref": "#/components/schemas/MessageResponse"
+										}
+									]
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Itens"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ItemRequest"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Erro ao deletar",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Itens"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

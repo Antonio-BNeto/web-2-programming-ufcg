@@ -4,9 +4,6 @@ import { ErrorResponse, MessageResponse } from "../types/responses";
 
 const repository = new PaymentRepository();
 
-/**
- * Interface sincronizada para documentação automática
- */
 interface PaymentRequest {
   /** @example 1 */
   saleId: number;
