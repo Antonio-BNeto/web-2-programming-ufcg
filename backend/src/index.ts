@@ -34,7 +34,7 @@ sequelize
     await setupApp();
 
 
-    return sequelize.sync();
+    return sequelize.sync({ alter: true });
   })
   .then(() => {
     app.listen(PORT, () => {

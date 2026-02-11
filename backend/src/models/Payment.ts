@@ -2,59 +2,70 @@ import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
 
 export interface PaymentAttributes {
-    id: number;
-    saleId: number;
-    status: string;
-    paymentDate: Date | null;
-    value: number;
+  id: number;
+  saleId: number;
+  paymentMethodId: number;
+  status: string;
+  paymentDate: Date | null;
+  value: number;
 }
 
 export interface PaymentCreationAttributes
-    extends Optional<PaymentAttributes, "id" | "paymentDate"> {}
+  extends Optional<PaymentAttributes, "id" | "paymentDate"> {}
 
 class Payment
-    extends Model<PaymentAttributes, PaymentCreationAttributes>
-    implements PaymentAttributes
+  extends Model<PaymentAttributes, PaymentCreationAttributes>
+  implements PaymentAttributes
 {
-    public id!: number;
-    public saleId!: number;
-    public status!: string;
-    public paymentDate!: Date | null;
-    public value!: number;
+  public id!: number;
+  public saleId!: number;
+  public paymentMethodId!: number;
+  public status!: string;
+  public paymentDate!: Date | null;
+  public value!: number;
 }
 
 Payment.init(
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true
-        },
-        saleId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            field: "sale_id"
-        },
-        status: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        paymentDate: {
-            type: DataTypes.DATE,
-            allowNull: true,
-            field: "payment_date"
-        },
-        value: {
-            type: DataTypes.FLOAT,
-            allowNull: false
-        }
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    {
-        sequelize,
-        tableName: "payments",
-        timestamps: false
-    }
-);
 
+    saleId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: "sale_id",
+    },
+
+    paymentMethodId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: "metodo_pagamento_id",
+    },
+
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+
+    paymentDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: "data_pagamento",
+    },
+
+    value: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: "payments",
+    timestamps: false,
+  }
+);
 
 export default Payment;
