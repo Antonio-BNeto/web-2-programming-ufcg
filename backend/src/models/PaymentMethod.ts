@@ -3,7 +3,7 @@ import sequelize from "../config/database";
 
 export interface PaymentMethodAttributes {
   id: number;
-  user_id: number;
+  userId: number;
   type: "PIX" | "CARD" | "BANK_ACCOUNT";
   main: boolean;
 }
@@ -16,7 +16,7 @@ class PaymentMethod
   implements PaymentMethodAttributes
 {
   public id!: number;
-  public user_id!: number;
+  public userId!: number;
   public type!: "PIX" | "CARD" | "BANK_ACCOUNT";
   public main!: boolean;
 }
@@ -29,7 +29,7 @@ PaymentMethod.init(
       primaryKey: true,
     },
 
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
