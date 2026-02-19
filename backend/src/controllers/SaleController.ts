@@ -17,19 +17,30 @@ export class SaleController extends Controller {
   @Post()
   @Security("jwt")
   @SuccessResponse(201, "Venda criada com sucesso")
+  @Response<ErrorResponse>(400, "Erro de negócio")
+  @Response<ErrorResponse>(500, "Erro interno")
   public async create(
     @Body() requestBody: SaleCreateRequest,
     @Request() request: AuthenticatedRequest
-  ): Promise<SaleResponse | ErrorResponse> {
+  ): Promise<SaleResponse> {
     try {
       const userId = request.user.id;
-      const sale = await SaleService.createSale(userId, requestBody.description, requestBody.items);
+
+      const sale = await SaleService.createSale(
+        userId,
+        requestBody.description,
+        requestBody.items
+      );
 
       this.setStatus(201);
       return sale.get({ plain: true }) as SaleResponse;
+
     } catch (err: any) {
       this.setStatus(err.message.includes("Estoque") ? 400 : 500);
-      return { message: "Erro ao criar venda", error: err.message };
+      throw {
+        message: "Erro ao criar venda",
+        error: err.message
+      };
     }
   }
 
@@ -60,34 +71,52 @@ export class SaleController extends Controller {
   public async getById(
     @Path() id: number,
     @Request() request: AuthenticatedRequest
-  ): Promise<SaleDetailResponse | MessageResponse> {
+  ): Promise<SaleDetailResponse> {
+
     try {
       const userId = request.user.id;
+
       const sale = await SaleService.getSaleById(id, userId);
 
       return sale.get({ plain: true }) as SaleDetailResponse;
+
     } catch (err: any) {
       this.setStatus(404);
-      return { message: err.message };
+      throw { message: err.message };
     }
   }
 
   @Put("{id}")
   @Security("jwt")
   @Response<MessageResponse>(404, "Venda não encontrada ou acesso negado")
+  @Response<MessageResponse>(400, "Erro de validação")
   public async update(
     @Path() id: number,
     @Body() requestBody: SaleUpdateRequest,
     @Request() request: AuthenticatedRequest
-  ): Promise<SaleResponse | MessageResponse> {
+  ): Promise<SaleResponse> {
+
     try {
       const userId = request.user.id;
-      const updated = await SaleService.updateSale(id, userId, requestBody);
+
+      const updated = await SaleService.updateSale(
+        id,
+        userId,
+        requestBody
+      );
 
       return updated.get({ plain: true }) as SaleResponse;
+
     } catch (err: any) {
-      this.setStatus(400);
-      return { message: err.message };
+
+      if (err.message.includes("não encontrada") ||
+        err.message.includes("acesso")) {
+        this.setStatus(404);
+      } else {
+        this.setStatus(400);
+      }
+
+      throw { message: err.message };
     }
   }
 }

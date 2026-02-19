@@ -23,18 +23,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"MessageResponse": {
-				"properties": {
-					"message": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"message"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"ErrorResponse": {
 				"properties": {
 					"message": {
@@ -66,55 +54,59 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Pick_UserRequest.Exclude_keyofUserRequest.password__": {
+			"UserResponseDTO": {
 				"properties": {
-					"cpf": {
-						"type": "string",
-						"example": "123.456.789-00"
-					},
-					"phoneNumber": {
-						"type": "string",
-						"example": "(83) 99999-9999"
-					},
-					"name": {
-						"type": "string",
-						"example": "Usuário"
-					},
-					"email": {
-						"type": "string",
-						"example": "usuario@email.com"
-					}
-				},
-				"required": [
-					"cpf",
-					"phoneNumber",
-					"name",
-					"email"
-				],
-				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"UserResponse": {
-				"properties": {
-					"cpf": {
-						"type": "string",
-						"example": "123.456.789-00"
-					},
-					"phoneNumber": {
-						"type": "string",
-						"example": "(83) 99999-9999"
-					},
-					"name": {
-						"type": "string",
-						"example": "Usuário"
-					},
-					"email": {
-						"type": "string",
-						"example": "usuario@email.com"
-					},
 					"id": {
 						"type": "number",
 						"format": "double"
+					},
+					"cpf": {
+						"type": "string"
+					},
+					"phoneNumber": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"role": {
+						"type": "string",
+						"enum": [
+							"USER",
+							"ADMIN"
+						]
+					}
+				},
+				"required": [
+					"id",
+					"cpf",
+					"phoneNumber",
+					"name",
+					"email",
+					"role"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateUserDTO": {
+				"properties": {
+					"cpf": {
+						"type": "string"
+					},
+					"phoneNumber": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
 					}
 				},
 				"required": [
@@ -122,68 +114,40 @@
 					"phoneNumber",
 					"name",
 					"email",
-					"id"
+					"password"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UserRequest": {
+			"MessageResponse": {
 				"properties": {
-					"cpf": {
-						"type": "string",
-						"example": "123.456.789-00"
-					},
-					"phoneNumber": {
-						"type": "string",
-						"example": "(83) 99999-9999"
-					},
-					"name": {
-						"type": "string",
-						"example": "Usuário"
-					},
-					"email": {
-						"type": "string",
-						"example": "usuario@email.com"
-					},
-					"password": {
-						"type": "string",
-						"example": "senhaSegura123"
+					"message": {
+						"type": "string"
 					}
 				},
 				"required": [
-					"cpf",
-					"phoneNumber",
-					"name",
-					"email"
+					"message"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Partial_UserRequest_": {
+			"UpdateUserDTO": {
 				"properties": {
-					"cpf": {
-						"type": "string",
-						"example": "123.456.789-00"
-					},
 					"phoneNumber": {
-						"type": "string",
-						"example": "(83) 99999-9999"
+						"type": "string"
 					},
 					"name": {
-						"type": "string",
-						"example": "Usuário"
+						"type": "string"
 					},
 					"email": {
-						"type": "string",
-						"example": "usuario@email.com"
+						"type": "string"
 					},
 					"password": {
-						"type": "string",
-						"example": "senhaSegura123"
+						"type": "string"
 					}
 				},
 				"type": "object",
-				"description": "Make all properties in T optional"
+				"additionalProperties": false
 			},
 			"SaleResponse": {
 				"properties": {
@@ -381,7 +345,8 @@
 					},
 					"id": {
 						"type": "number",
-						"format": "double"
+						"format": "double",
+						"example": 1
 					}
 				},
 				"required": [
@@ -427,6 +392,36 @@
 					"paymentMethodId",
 					"status",
 					"value"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PaginatedResponse_PaymentResponse_": {
+				"properties": {
+					"totalItems": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/PaymentResponse"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalItems",
+					"totalPages",
+					"currentPage",
+					"items"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -524,17 +519,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/LoginResponse"
-										},
-										{
-											"$ref": "#/components/schemas/MessageResponse"
-										},
-										{
-											"$ref": "#/components/schemas/ErrorResponse"
-										}
-									]
+									"$ref": "#/components/schemas/LoginResponse"
 								}
 							}
 						}
@@ -587,14 +572,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/UserResponse"
-										},
-										{
-											"$ref": "#/components/schemas/ErrorResponse"
-										}
-									]
+									"$ref": "#/components/schemas/UserResponseDTO"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Erro interno",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -610,7 +598,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/UserRequest"
+								"$ref": "#/components/schemas/CreateUserDTO"
 							}
 						}
 					}
@@ -625,7 +613,7 @@
 							"application/json": {
 								"schema": {
 									"items": {
-										"$ref": "#/components/schemas/UserResponse"
+										"$ref": "#/components/schemas/UserResponseDTO"
 									},
 									"type": "array"
 								}
@@ -649,14 +637,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/UserResponse"
-										},
-										{
-											"$ref": "#/components/schemas/MessageResponse"
-										}
-									]
+									"$ref": "#/components/schemas/UserResponseDTO"
 								}
 							}
 						}
@@ -696,14 +677,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/MessageResponse"
-										},
-										{
-											"$ref": "#/components/schemas/ErrorResponse"
-										}
-									]
+									"$ref": "#/components/schemas/MessageResponse"
 								}
 							}
 						}
@@ -714,6 +688,16 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Erro interno",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -739,7 +723,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/Partial_UserRequest_"
+								"$ref": "#/components/schemas/UpdateUserDTO"
 							}
 						}
 					}
@@ -755,14 +739,27 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/SaleResponse"
-										},
-										{
-											"$ref": "#/components/schemas/ErrorResponse"
-										}
-									]
+									"$ref": "#/components/schemas/SaleResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Erro de negócio",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Erro interno",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -892,14 +889,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/SaleDetailResponse"
-										},
-										{
-											"$ref": "#/components/schemas/MessageResponse"
-										}
-									]
+									"$ref": "#/components/schemas/SaleDetailResponse"
 								}
 							}
 						}
@@ -943,14 +933,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/SaleResponse"
-										},
-										{
-											"$ref": "#/components/schemas/MessageResponse"
-										}
-									]
+									"$ref": "#/components/schemas/SaleResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Erro de validação",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
 								}
 							}
 						}
@@ -1006,23 +999,13 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/PaymentResponse"
-										},
-										{
-											"$ref": "#/components/schemas/ErrorResponse"
-										},
-										{
-											"$ref": "#/components/schemas/MessageResponse"
-										}
-									]
+									"$ref": "#/components/schemas/PaymentResponse"
 								}
 							}
 						}
 					},
 					"400": {
-						"description": "Falha na criação",
+						"description": "Erro ao criar pagamento",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -1035,7 +1018,11 @@
 				"tags": [
 					"Pagamentos"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
 				"parameters": [],
 				"requestBody": {
 					"required": true,
@@ -1056,10 +1043,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/PaymentResponse"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/PaginatedResponse_PaymentResponse_"
 								}
 							}
 						}
@@ -1068,8 +1052,33 @@
 				"tags": [
 					"Pagamentos"
 				],
-				"security": [],
-				"parameters": []
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/payments/{id}": {
@@ -1081,14 +1090,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/PaymentResponse"
-										},
-										{
-											"$ref": "#/components/schemas/ErrorResponse"
-										}
-									]
+									"$ref": "#/components/schemas/PaymentResponse"
 								}
 							}
 						}
@@ -1098,7 +1100,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
+									"$ref": "#/components/schemas/MessageResponse"
 								}
 							}
 						}
@@ -1107,7 +1109,11 @@
 				"tags": [
 					"Pagamentos"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -1119,73 +1125,6 @@
 						}
 					}
 				]
-			},
-			"put": {
-				"operationId": "Update",
-				"responses": {
-					"200": {
-						"description": "Atualizado com sucesso",
-						"content": {
-							"application/json": {
-								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/PaymentResponse"
-										},
-										{
-											"$ref": "#/components/schemas/ErrorResponse"
-										}
-									]
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Erro na atualização",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Não encontrado",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Pagamentos"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/PaymentRequest"
-							}
-						}
-					}
-				}
 			}
 		},
 		"/items": {
@@ -1197,14 +1136,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/ItemResponse"
-										},
-										{
-											"$ref": "#/components/schemas/ErrorResponse"
-										}
-									]
+									"$ref": "#/components/schemas/ItemResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Erro interno",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -1263,14 +1205,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/ItemResponse"
-										},
-										{
-											"$ref": "#/components/schemas/MessageResponse"
-										}
-									]
+									"$ref": "#/components/schemas/ItemResponse"
 								}
 							}
 						}
@@ -1310,14 +1245,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/ItemResponse"
-										},
-										{
-											"$ref": "#/components/schemas/MessageResponse"
-										}
-									]
+									"$ref": "#/components/schemas/ItemResponse"
 								}
 							}
 						}

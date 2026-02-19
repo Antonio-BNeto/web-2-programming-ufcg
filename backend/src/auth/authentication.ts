@@ -17,7 +17,13 @@ export function expressAuthentication(
 
       try {
         const decoded = verifyToken(token) as UserPayload;
-        request.user = decoded;
+        if (scopes && scopes.length > 0) {
+          const hasAccess = scopes.includes(decoded.role);
+          if (!hasAccess) {
+            return reject(new Error("Insufficient permissions"));
+          }
+        }
+        (request as any).user = decoded;
         resolve(decoded);
       } catch (err) {
         reject(new Error("Invalid token"));

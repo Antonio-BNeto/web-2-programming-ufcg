@@ -13,7 +13,7 @@ export interface UserAttributes {
 }
 
 export interface UserCreationAttributes
-    extends Optional<UserAttributes, "id"> {}
+    extends Optional<UserAttributes, "id"| "role"> {}
 
 class User
     extends Model<UserAttributes, UserCreationAttributes>
