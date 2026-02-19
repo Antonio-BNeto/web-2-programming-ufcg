@@ -1,77 +1,104 @@
-import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Response, Tags } from "tsoa";
-import { PaymentRepository } from "../repository/PaymentRepository";
+import {
+  Controller,
+  Get,
+  Post,
+  Route,
+  Body,
+  Path,
+  SuccessResponse,
+  Response,
+  Tags,
+  Security,
+  Request,
+  Query
+} from "tsoa";
+
 import { ErrorResponse, MessageResponse } from "../types/responses";
-
-const repository = new PaymentRepository();
-
-interface PaymentRequest {
-  /** @example 1 */
-  saleId: number;
-  /** @example "PENDING" */
-  status: string;
-  /** @example 150.50 */
-  value: number;
-  /** @example "2026-02-03T23:00:00Z" */
-  paymentDate?: Date | null;
-}
-
-interface PaymentResponse extends PaymentRequest {
-  id: number;
-}
+import { AuthenticatedRequest } from "../types/auth";
+import { PaymentRequest } from "../dto/payment/PaymentRequest.dto";
+import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
+import PaymentService from "../services/PaymentService";
+import { PaymentResponse } from "../dto/payment/PaymentResponse.dto";
 
 @Route("payments")
 @Tags("Pagamentos")
+@Security("jwt")
 export class PaymentController extends Controller {
 
+  // ✅ CREATE
   @Post()
   @SuccessResponse(201, "Criado com sucesso")
-  @Response<ErrorResponse>(400, "Falha na criação")
-  public async create(@Body() requestBody: PaymentRequest): Promise<PaymentResponse | ErrorResponse | MessageResponse> {
+  @Response<ErrorResponse>(400, "Erro ao criar pagamento")
+  public async create(
+    @Body() requestBody: PaymentRequest,
+    @Request() request: AuthenticatedRequest
+  ): Promise<PaymentResponse> {
     try {
-      const payment = await repository.create(requestBody);
+      const payment = await PaymentService.createPayment(requestBody);
+
       this.setStatus(201);
-      return payment as unknown as PaymentResponse;
-    } catch (error) {
+      return payment.get({ plain: true }) as PaymentResponse;
+
+    } catch (error: any) {
       this.setStatus(400);
-      return { message: "Failed to create payment", error };
+      throw {
+        message: "Erro ao criar pagamento",
+        error: error.message
+      };
     }
   }
 
+  // ✅ FIND ALL (já estava correto)
   @Get()
-  public async findAll(): Promise<PaymentResponse[]> {
-    const payments = await repository.findAll();
-    return payments as unknown as PaymentResponse[];
+  public async findAll(
+    @Request() request: AuthenticatedRequest,
+    @Query() page: number = 1,
+    @Query() limit: number = 10
+  ): Promise<PaginatedResponse<PaymentResponse>> {
+
+    const userId = request.user.id;
+    const isAdmin = request.user.role === "ADMIN";
+
+    const result = await PaymentService.getPaymentsPaginated(
+      userId,
+      isAdmin,
+      page,
+      limit
+    );
+
+    return {
+      ...result,
+      items: result.items.map(p =>
+        p.get({ plain: true })
+      ) as PaymentResponse[]
+    };
   }
 
+  // ✅ FIND BY ID
   @Get("{id}")
-  @Response<ErrorResponse>(404, "Não encontrado")
-  public async findById(@Path() id: number): Promise<PaymentResponse | ErrorResponse> {
-    const payment = await repository.findById(id);
-    if (!payment) {
-      this.setStatus(404);
-      return { message: "Payment not found" };
-    }
-    return payment as unknown as PaymentResponse;
-  }
-
-  @Put("{id}")
-  @SuccessResponse(200, "Atualizado com sucesso")
-  @Response<ErrorResponse>(404, "Não encontrado")
-  @Response<ErrorResponse>(400, "Erro na atualização")
-  public async update(
+  @Response<MessageResponse>(404, "Não encontrado")
+  public async findById(
     @Path() id: number,
-    @Body() requestBody: PaymentRequest
-  ): Promise<PaymentResponse | ErrorResponse> {
+    @Request() request: AuthenticatedRequest
+  ): Promise<PaymentResponse> {
+
     try {
-      const updated = await repository.update(id, requestBody);
-      if (!updated) {
-        this.setStatus(404);
-        return { message: "Pagamento não encontrado" };
-      }
-      return updated as unknown as PaymentResponse;
-    } catch (error) {
-      this.setStatus(400);
-      return { message: "Falha na atualização do pagamento", error };
+      const userId = request.user.id;
+      const isAdmin = request.user.role === "ADMIN";
+
+      const payment = await PaymentService.getPaymentById(
+        id,
+        userId,
+        isAdmin
+      );
+
+      return payment.get({ plain: true }) as PaymentResponse;
+
+    } catch (error: any) {
+      this.setStatus(404);
+      throw {
+        message: error.message
+      };
     }
   }
 }
