@@ -2,11 +2,12 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import sequelize from './config/database';
 import dotenv from 'dotenv';
-
-import './models';
+import { createDefaultAdmin } from './utils/setupAdmin';
+import { setupAssociations } from './models/associations';
 
 dotenv.config();
 
+setupAssociations();
 const app = express();
 app.use(express.json());
 
@@ -36,7 +37,10 @@ sequelize
 
     return sequelize.sync({ alter: true });
   })
-  .then(() => {
+  .then(async () => {
+
+    await createDefaultAdmin();
+
     app.listen(PORT, () => {
       console.log(`🚀 Servidor rodando na porta ${PORT}`);
       console.log(`📄 Swagger: http://localhost:${PORT}/api-docs`);

@@ -9,6 +9,7 @@ export interface UserAttributes {
     name: string;
     email: string;
     password: string;
+    role: 'USER' | 'ADMIN'
 }
 
 export interface UserCreationAttributes
@@ -24,6 +25,7 @@ class User
     public name!: string;
     public email!: string;
     public password!: string;
+    public role!: 'USER' | 'ADMIN';
 }
 
 
@@ -55,6 +57,11 @@ User.init(
         password: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        role: {
+            type: DataTypes.ENUM('USER', 'ADMIN'),
+            allowNull: false,
+            defaultValue: 'USER'
         }
     },
     {

@@ -121,15 +121,32 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Partial_Omit_SaleCreateRequest.items__": {
-        "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"description":{"dataType":"string"}},"validators":{}},
+    "SaleDetailResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "valueTotal": {"dataType":"double","required":true},
+            "description": {"dataType":"string","required":true},
+            "userId": {"dataType":"double","required":true},
+            "vendedor": {"dataType":"nestedObjectLiteral","nestedProperties":{"email":{"dataType":"string","required":true},"name":{"dataType":"string","required":true}}},
+            "itens": {"dataType":"array","array":{"dataType":"any"}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SaleUpdateRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "description": {"dataType":"string"},
+        },
+        "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PaymentResponse": {
         "dataType": "refObject",
         "properties": {
             "saleId": {"dataType":"double","required":true},
+            "paymentMethodId": {"dataType":"double","required":true},
             "status": {"dataType":"string","required":true},
             "value": {"dataType":"double","required":true},
             "paymentDate": {"dataType":"union","subSchemas":[{"dataType":"datetime"},{"dataType":"enum","enums":[null]}]},
@@ -142,6 +159,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "saleId": {"dataType":"double","required":true},
+            "paymentMethodId": {"dataType":"double","required":true},
             "status": {"dataType":"string","required":true},
             "value": {"dataType":"double","required":true},
             "paymentDate": {"dataType":"union","subSchemas":[{"dataType":"datetime"},{"dataType":"enum","enums":[null]}]},
@@ -436,7 +454,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsSaleController_update: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
-                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"Partial_Omit_SaleCreateRequest.items__"},
+                requestBody: {"in":"body","name":"requestBody","required":true,"ref":"SaleUpdateRequest"},
                 request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.put('/sales/:id',
