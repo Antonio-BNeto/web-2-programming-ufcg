@@ -1,61 +1,93 @@
-import { Request, Response } from 'express';
+import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Response, Tags } from "tsoa";
 import { UserRepository } from '../repository/UserRepository';
-
+import { hashPassword } from '../utils/auth';
+import { ErrorResponse, MessageResponse } from "../types/responses";
+import {
+  CreateUserDTO,
+  UpdateUserDTO,
+  UserResponseDTO
+} from "../dto/user";
 const userRepository = new UserRepository();
 
-export class UserController {
 
-    async create(req: Request, res: Response) {
-        try {
-            const { cpf, phoneNumber, name, email, password } = req.body;
-            const user = await userRepository.createUser({
-                cpf, phoneNumber, name, email, password
-            });
+@Route("users")
+@Tags("Usuários")
+export class UserController extends Controller {
 
-            return res.status(201).json(user);
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
+  @Post()
+  @SuccessResponse(201, "Criado com sucesso")
+  @Response<ErrorResponse>(500, "Erro interno")
+  public async create(
+    @Body() requestBody: CreateUserDTO
+  ): Promise<UserResponseDTO> {
+    try {
+      const { password, ...rest } = requestBody;
+      const hashedPassword = await hashPassword(password!);
+
+      const user = await userRepository.createUser({
+        ...rest,
+        password: hashedPassword,
+        role: 'USER'
+      });
+
+      this.setStatus(201);
+      return user as unknown as UserResponseDTO;
+
+    } catch (error: any) {
+      this.setStatus(500);
+      throw {
+        message: "Erro ao criar usuário",
+        error: error.message
+      };
+    }
+  }
+
+  @Get()
+  public async getAll(): Promise<UserResponseDTO[]> {
+    const users = await userRepository.getAllUsers();
+    return users as unknown as UserResponseDTO[];
+  }
+
+  @Get("{id}")
+  @Response<MessageResponse>(404, "Não encontrado")
+  public async getById(
+    @Path() id: number
+  ): Promise<UserResponseDTO> {
+
+    const user = await userRepository.getUserById(id);
+
+    if (!user) {
+      this.setStatus(404);
+      throw {
+        message: "Usuário não encontrado"
+      };
     }
 
-    async getAll(req: Request, res: Response) {
-        try {
-            const users = await userRepository.getAllUsers();
-            return res.status(200).json(users);
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
+    return user as unknown as UserResponseDTO;
+  }
+
+  @Put("{id}")
+  @Response<MessageResponse>(404, "Não encontrado")
+  @Response<ErrorResponse>(500, "Erro interno")
+  public async update(
+    @Path() id: number,
+    @Body() requestBody: UpdateUserDTO
+  ): Promise<MessageResponse> {
+    try {
+      const updated = await userRepository.updateUser(id, requestBody);
+
+      if (!updated) {
+        this.setStatus(404);
+        throw { message: "Usuário não encontrado ou dados iguais" };
+      }
+
+      return { message: "Usuário atualizado com sucesso" };
+    } catch (error: any) {
+      this.setStatus(500);
+      throw {
+        message: "Erro ao atualizar usuário",
+        error: error.message
+      };
     }
-
-    async getById(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const user = await userRepository.getUserById(Number(id));
-
-            if (!user) {
-                return res.status(404).json({ message: 'Usuário não encontrado' });
-            }
-
-            return res.status(200).json(user);
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
-    }
-
-    async update(req: Request, res: Response) {
-        try {
-            const { id } = req.params;
-            const data = req.body;
-
-            const updated = await userRepository.updateUser(Number(id), data);
-
-            if (!updated) {
-                return res.status(404).json({ message: 'Usuário não encontrado ou dados iguais' });
-            }
-
-            return res.status(200).json({ message: 'Usuário atualizado com sucesso' });
-        } catch (error: any) {
-            return res.status(500).json({ error: error.message });
-        }
-    }
+  }
 }

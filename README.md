@@ -244,5 +244,5 @@ docker compose up --build -d
 
 # 👨‍💻 Autores
 
--   Antonio Barros de Alcântara Neto
+-   Antonio Barros de Alcantara Neto
 -   Paulo Ricardo Oliveira de Macêdo

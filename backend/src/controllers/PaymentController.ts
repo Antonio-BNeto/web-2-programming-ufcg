@@ -1,51 +1,104 @@
-import { Request, Response } from "express";
-import { PaymentRepository } from "../repository/PaymentRepository";
+import {
+  Controller,
+  Get,
+  Post,
+  Route,
+  Body,
+  Path,
+  SuccessResponse,
+  Response,
+  Tags,
+  Security,
+  Request,
+  Query
+} from "tsoa";
 
-const repository = new PaymentRepository();
+import { ErrorResponse, MessageResponse } from "../types/responses";
+import { AuthenticatedRequest } from "../types/auth";
+import { PaymentRequest } from "../dto/payment/PaymentRequest.dto";
+import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
+import PaymentService from "../services/PaymentService";
+import { PaymentResponse } from "../dto/payment/PaymentResponse.dto";
 
-export class PaymentController {
+@Route("payments")
+@Tags("Pagamentos")
+@Security("jwt")
+export class PaymentController extends Controller {
 
-    async create(req: Request, res: Response) {
-        try {
-            const payment = await repository.create(req.body);
-            return res.status(201).json(payment);
-        } catch (error) {
-            return res.status(400).json({ error: "Failed to create payment", details: error });
-        }
+  // ✅ CREATE
+  @Post()
+  @SuccessResponse(201, "Criado com sucesso")
+  @Response<ErrorResponse>(400, "Erro ao criar pagamento")
+  public async create(
+    @Body() requestBody: PaymentRequest,
+    @Request() request: AuthenticatedRequest
+  ): Promise<PaymentResponse> {
+    try {
+      const payment = await PaymentService.createPayment(requestBody);
+
+      this.setStatus(201);
+      return payment.get({ plain: true }) as PaymentResponse;
+
+    } catch (error: any) {
+      this.setStatus(400);
+      throw {
+        message: "Erro ao criar pagamento",
+        error: error.message
+      };
     }
+  }
 
-    async findAll(req: Request, res: Response) {
-        try {
-            const payments = await repository.findAll();
-            return res.json(payments);
-        } catch (error) {
-            return res.status(500).json({ error: "Failed to fetch payments" });
-        }
+  // ✅ FIND ALL (já estava correto)
+  @Get()
+  public async findAll(
+    @Request() request: AuthenticatedRequest,
+    @Query() page: number = 1,
+    @Query() limit: number = 10
+  ): Promise<PaginatedResponse<PaymentResponse>> {
+
+    const userId = request.user.id;
+    const isAdmin = request.user.role === "ADMIN";
+
+    const result = await PaymentService.getPaymentsPaginated(
+      userId,
+      isAdmin,
+      page,
+      limit
+    );
+
+    return {
+      ...result,
+      items: result.items.map(p =>
+        p.get({ plain: true })
+      ) as PaymentResponse[]
+    };
+  }
+
+  // ✅ FIND BY ID
+  @Get("{id}")
+  @Response<MessageResponse>(404, "Não encontrado")
+  public async findById(
+    @Path() id: number,
+    @Request() request: AuthenticatedRequest
+  ): Promise<PaymentResponse> {
+
+    try {
+      const userId = request.user.id;
+      const isAdmin = request.user.role === "ADMIN";
+
+      const payment = await PaymentService.getPaymentById(
+        id,
+        userId,
+        isAdmin
+      );
+
+      return payment.get({ plain: true }) as PaymentResponse;
+
+    } catch (error: any) {
+      this.setStatus(404);
+      throw {
+        message: error.message
+      };
     }
-
-    async findById(req: Request, res: Response) {
-        try {
-            const id = Number(req.params.id);
-            const payment = await repository.findById(id);
-
-            if (!payment) return res.status(404).json({ error: "Payment not found" });
-
-            return res.json(payment);
-        } catch (error) {
-            return res.status(500).json({ error: "Failed to fetch payment" });
-        }
-    }
-
-    async update(req: Request, res: Response) {
-        try {
-            const id = Number(req.params.id);
-            const updated = await repository.update(id, req.body);
-
-            if (!updated) return res.status(404).json({ error: "Pagamento não encontrado" });
-
-            return res.json(updated);
-        } catch (error) {
-            return res.status(400).json({ error: "Falha na atuallização do pagamento" });
-        }
-    }
+  }
 }

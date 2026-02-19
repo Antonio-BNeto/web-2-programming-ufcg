@@ -1,30 +1,122 @@
-import { Request, Response } from "express";
-import SaleRepository from "../repository/SaleRepository";
+import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Response, Tags, Security, Request, Query } from "tsoa";
+import { ErrorResponse, MessageResponse } from "../types/responses";
+import { AuthenticatedRequest } from "../types/auth";
+import SaleService from "../services/SaleService";
+import {
+  SaleCreateRequest,
+  SaleResponse,
+  SaleUpdateRequest,
+  SaleDetailResponse
+} from "../dto/sale";
+import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
 
-export class SaleController {
-    async create(req: Request, res: Response) {
-        try {
-            const sale = await SaleRepository.create(req.body);
-            return res.status(201).json(sale);
-        } catch (err: any) {
-            return res.status(500).json({ error: err.message });
-        }
-    }
+@Route("sales")
+@Tags("Vendas")
+export class SaleController extends Controller {
 
-    async getAll(req: Request, res: Response) {
-        const sales = await SaleRepository.findAll();
-        return res.json(sales);
-    }
+  @Post()
+  @Security("jwt")
+  @SuccessResponse(201, "Venda criada com sucesso")
+  @Response<ErrorResponse>(400, "Erro de negócio")
+  @Response<ErrorResponse>(500, "Erro interno")
+  public async create(
+    @Body() requestBody: SaleCreateRequest,
+    @Request() request: AuthenticatedRequest
+  ): Promise<SaleResponse> {
+    try {
+      const userId = request.user.id;
 
-    async getById(req: Request, res: Response) {
-        const sale = await SaleRepository.findById(Number(req.params.id));
-        if (!sale) return res.status(404).json({ message: "Venda não encontrada" });
-        return res.json(sale);
-    }
+      const sale = await SaleService.createSale(
+        userId,
+        requestBody.description,
+        requestBody.items
+      );
 
-    async update(req: Request, res: Response) {
-        const updated = await SaleRepository.update(Number(req.params.id), req.body);
-        if (!updated) return res.status(404).json({ message: "Venda não encontrada" });
-        return res.json(updated);
+      this.setStatus(201);
+      return sale.get({ plain: true }) as SaleResponse;
+
+    } catch (err: any) {
+      this.setStatus(err.message.includes("Estoque") ? 400 : 500);
+      throw {
+        message: "Erro ao criar venda",
+        error: err.message
+      };
     }
+  }
+
+  @Get()
+  @Security("jwt")
+  public async getAll(
+    @Request() request: AuthenticatedRequest,
+    @Query() page: number = 1,
+    @Query() limit: number = 10
+  ): Promise<PaginatedResponse<SaleDetailResponse>> {
+    const userId = request.user.id;
+
+    return await SaleService.getSalesPaginated(userId, page, limit);
+  }
+
+  @Get("admin/all")
+  @Security("jwt", ["ADMIN"])
+  public async getAllForAdmin(
+    @Query() page: number = 1,
+    @Query() limit: number = 10
+  ): Promise<PaginatedResponse<SaleDetailResponse>> {
+    return await SaleService.getAllSalesPaginatedAdmin(page, limit);
+  }
+
+  @Get("{id}")
+  @Security("jwt")
+  @Response<MessageResponse>(404, "Venda não encontrada")
+  public async getById(
+    @Path() id: number,
+    @Request() request: AuthenticatedRequest
+  ): Promise<SaleDetailResponse> {
+
+    try {
+      const userId = request.user.id;
+
+      const sale = await SaleService.getSaleById(id, userId);
+
+      return sale.get({ plain: true }) as SaleDetailResponse;
+
+    } catch (err: any) {
+      this.setStatus(404);
+      throw { message: err.message };
+    }
+  }
+
+  @Put("{id}")
+  @Security("jwt")
+  @Response<MessageResponse>(404, "Venda não encontrada ou acesso negado")
+  @Response<MessageResponse>(400, "Erro de validação")
+  public async update(
+    @Path() id: number,
+    @Body() requestBody: SaleUpdateRequest,
+    @Request() request: AuthenticatedRequest
+  ): Promise<SaleResponse> {
+
+    try {
+      const userId = request.user.id;
+
+      const updated = await SaleService.updateSale(
+        id,
+        userId,
+        requestBody
+      );
+
+      return updated.get({ plain: true }) as SaleResponse;
+
+    } catch (err: any) {
+
+      if (err.message.includes("não encontrada") ||
+        err.message.includes("acesso")) {
+        this.setStatus(404);
+      } else {
+        this.setStatus(400);
+      }
+
+      throw { message: err.message };
+    }
+  }
 }

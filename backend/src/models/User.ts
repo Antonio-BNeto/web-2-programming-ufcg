@@ -1,5 +1,6 @@
 import {Model, DataTypes, Optional} from 'sequelize';
 import sequelize from '../config/database';
+import Sale from './Sale';
 
 export interface UserAttributes {
     id: number;
@@ -8,12 +9,13 @@ export interface UserAttributes {
     name: string;
     email: string;
     password: string;
+    role: 'USER' | 'ADMIN'
 }
 
 export interface UserCreationAttributes
-    extends Optional<UserAttributes, "id"> {}
+    extends Optional<UserAttributes, "id"| "role"> {}
 
-export class User
+class User
     extends Model<UserAttributes, UserCreationAttributes>
     implements UserAttributes
 {
@@ -23,6 +25,7 @@ export class User
     public name!: string;
     public email!: string;
     public password!: string;
+    public role!: 'USER' | 'ADMIN';
 }
 
 
@@ -54,6 +57,11 @@ User.init(
         password: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        role: {
+            type: DataTypes.ENUM('USER', 'ADMIN'),
+            allowNull: false,
+            defaultValue: 'USER'
         }
     },
     {
@@ -62,3 +70,5 @@ User.init(
         timestamps: false
     }
 )
+
+export default User;
