@@ -346,6 +346,139 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PaymentSaleResponse": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"userId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"description": {
+						"type": "string",
+						"example": "Venda de periféricos gamer"
+					},
+					"valueTotal": {
+						"type": "number",
+						"format": "double",
+						"example": 250.5
+					}
+				},
+				"required": [
+					"id",
+					"userId",
+					"description",
+					"valueTotal"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PaymentResponse": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"saleId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"paymentMethodId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"value": {
+						"type": "number",
+						"format": "double",
+						"example": 150.5
+					},
+					"status": {
+						"type": "string",
+						"example": "PAID"
+					},
+					"paymentDate": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2026-02-26T12:00:00.000Z"
+					},
+					"sale": {
+						"$ref": "#/components/schemas/PaymentSaleResponse"
+					}
+				},
+				"required": [
+					"id",
+					"saleId",
+					"paymentMethodId",
+					"value",
+					"status",
+					"paymentDate"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PaginatedResponse_PaymentResponse_": {
+				"properties": {
+					"totalItems": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/PaymentResponse"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalItems",
+					"totalPages",
+					"currentPage",
+					"items"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PaymentRequest": {
+				"properties": {
+					"saleId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"paymentMethodId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"value": {
+						"type": "number",
+						"format": "double",
+						"example": 150.5
+					}
+				},
+				"required": [
+					"saleId",
+					"paymentMethodId",
+					"value"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ItemResponse": {
 				"properties": {
 					"name": {
@@ -466,13 +599,7 @@
 				"description": "Make all properties in T optional"
 			}
 		},
-		"securitySchemes": {
-			"jwt": {
-				"type": "http",
-				"scheme": "bearer",
-				"bearerFormat": "JWT"
-			}
-		}
+		"securitySchemes": {}
 	},
 	"info": {
 		"title": "backend",
@@ -1020,6 +1147,187 @@
 						}
 					}
 				}
+			}
+		},
+		"/payments": {
+			"get": {
+				"operationId": "GetAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaginatedResponse_PaymentResponse_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"201": {
+						"description": "Pagamento criado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaymentResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Erro de validação",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PaymentRequest"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/payments/{id}": {
+			"get": {
+				"operationId": "GetById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaymentResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Pagamento não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Pagamento não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/items": {

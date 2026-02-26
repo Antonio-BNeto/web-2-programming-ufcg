@@ -3,6 +3,8 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import sequelize from './config/database';
 import dotenv from 'dotenv';
+import fs from 'fs'; // Importação necessária
+import path from 'path'; // Importação necessária
 import { createDefaultAdmin } from './utils/setupAdmin';
 import { setupAssociations } from './models/associations';
 
@@ -14,7 +16,10 @@ app.use(express.json());
 
 const setupApp = async () => {
   try {
-    const swaggerDocument = await import('./swagger/swagger.json');
+    const swaggerPath = path.join(__dirname, './swagger/swagger.json');
+    const swaggerData = fs.readFileSync(swaggerPath, 'utf8');
+    const swaggerDocument = JSON.parse(swaggerData);
+
     const { RegisterRoutes } = await import('./swagger/routes');
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -35,11 +40,9 @@ sequelize
 
     await setupApp();
 
-
     return sequelize.sync({ alter: true });
   })
   .then(async () => {
-
     await createDefaultAdmin();
 
     app.listen(PORT, () => {

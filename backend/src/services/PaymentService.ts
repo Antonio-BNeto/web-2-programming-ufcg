@@ -4,16 +4,38 @@ import Sale from "../models/Sale";
 import PaymentMethod from "../models/PaymentMethod";
 import { paginate } from "../utils/pagination";
 import { PaymentRequest } from "../dto/payment/PaymentRequest.dto";
+import { PaymentResponse } from "../dto/payment/PaymentResponse.dto";
+import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
 
 class PaymentService {
+
+  private mapToResponse(payment: Payment): PaymentResponse {
+    return {
+      id: payment.id,
+      saleId: payment.saleId,
+      paymentMethodId: payment.paymentMethodId,
+      value: Number(payment.value),
+      status: payment.status,
+      paymentDate: payment.paymentDate,
+      sale: payment.sale
+        ? {
+            id: payment.sale.id,
+            userId: payment.sale.userId,
+            description: payment.sale.description,
+            valueTotal: payment.sale.valueTotal
+          }
+        : undefined
+    };
+  }
 
   async getPaymentsPaginated(
     userId: number,
     isAdmin: boolean,
     page: number,
     limit: number
-  ) {
-    return await paginate(Payment, page, limit, {
+  ): Promise<PaginatedResponse<PaymentResponse>> {
+
+    const result = await paginate(Payment, page, limit, {
       include: [
         {
           model: Sale,
@@ -24,9 +46,22 @@ class PaymentService {
       ],
       order: [["id", "DESC"]]
     });
+
+    return {
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
+      items: result.items.map((p: Payment) =>
+        this.mapToResponse(p)
+      )
+    };
   }
 
-  async createPayment(data: PaymentRequest) {
+  async createPayment(
+    data: PaymentRequest,
+    userId: number
+  ): Promise<PaymentResponse> {
+
     const { saleId, paymentMethodId, value } = data;
     const transaction = await sequelize.transaction();
 
@@ -44,7 +79,13 @@ class PaymentService {
         throw new Error("Venda não encontrada.");
       }
 
-      const paymentMethod = await PaymentMethod.findByPk(paymentMethodId, { transaction });
+      if (sale.userId !== userId) {
+        throw new Error("Acesso negado.");
+      }
+
+      const paymentMethod = await PaymentMethod.findByPk(paymentMethodId, {
+        transaction
+      });
 
       if (!paymentMethod) {
         throw new Error("Método de pagamento não encontrado.");
@@ -82,7 +123,8 @@ class PaymentService {
       );
 
       await transaction.commit();
-      return payment;
+
+      return this.mapToResponse(payment);
 
     } catch (error) {
       await transaction.rollback();
@@ -94,7 +136,8 @@ class PaymentService {
     paymentId: number,
     userId: number,
     isAdmin: boolean
-  ) {
+  ): Promise<PaymentResponse> {
+
     const payment = await Payment.findByPk(paymentId, {
       include: [
         {
@@ -109,7 +152,7 @@ class PaymentService {
       throw new Error("Pagamento não encontrado ou acesso negado.");
     }
 
-    return payment;
+    return this.mapToResponse(payment);
   }
 
   async deletePayment(
