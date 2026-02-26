@@ -1,7 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../config/database";
 
-
 export interface ItemAttributes {
     id: number;
     name: string;
@@ -10,9 +9,13 @@ export interface ItemAttributes {
     quantity: number;
 }
 
-export interface ItemCreationAttributes extends Optional<ItemAttributes, "id"> {}
+export interface ItemCreationAttributes
+    extends Optional<ItemAttributes, "id"> {}
 
-class Item extends Model<ItemAttributes, ItemCreationAttributes> implements ItemAttributes {
+class Item
+    extends Model<ItemAttributes, ItemCreationAttributes>
+    implements ItemAttributes
+{
     public id!: number;
     public name!: string;
     public description!: string;
@@ -21,7 +24,6 @@ class Item extends Model<ItemAttributes, ItemCreationAttributes> implements Item
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
-
 }
 
 Item.init(
@@ -40,7 +42,7 @@ Item.init(
             allowNull: false,
         },
         price: {
-            type: DataTypes.FLOAT,
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
         },
         quantity: {

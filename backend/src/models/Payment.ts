@@ -1,11 +1,13 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
 
+export type PaymentStatus = "PAID" | "PENDING" | "CANCELLED";
+
 export interface PaymentAttributes {
   id: number;
   saleId: number;
   paymentMethodId: number;
-  status: string;
+  status: PaymentStatus;
   paymentDate: Date | null;
   value: number;
 }
@@ -20,7 +22,7 @@ class Payment
   public id!: number;
   public saleId!: number;
   public paymentMethodId!: number;
-  public status!: string;
+  public status!: PaymentStatus;
   public paymentDate!: Date | null;
   public value!: number;
 }
@@ -46,7 +48,7 @@ Payment.init(
     },
 
     status: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("PAID", "PENDING", "CANCELLED"),
       allowNull: false,
     },
 
@@ -57,7 +59,7 @@ Payment.init(
     },
 
     value: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
   },

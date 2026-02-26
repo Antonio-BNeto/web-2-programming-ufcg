@@ -1,3 +1,4 @@
+import sequelize from "../config/database";
 import Item, { ItemCreationAttributes } from "../models/Item";
 
 class ItemService {
@@ -7,7 +8,7 @@ class ItemService {
             throw new Error("Nome e descrição são obrigatórios.");
         }
 
-        if (data.price === undefined || data.price < 0) {
+        if (data.price === undefined || Number(data.price) < 0) {
             throw new Error("Preço deve ser um valor positivo.");
         }
 
@@ -17,6 +18,7 @@ class ItemService {
 
         const item = await Item.create({
             ...data,
+            price: Number(data.price),
             quantity: data.quantity ?? 0
         });
 
@@ -33,9 +35,10 @@ class ItemService {
         return item;
     }
 
-
     async getAllItems() {
-        return await Item.findAll();
+        return await Item.findAll({
+            order: [["id", "DESC"]]
+        });
     }
 
     async updateItem(itemId: number, data: Partial<ItemCreationAttributes>) {
@@ -45,7 +48,7 @@ class ItemService {
             throw new Error("Item não encontrado.");
         }
 
-        if (data.price !== undefined && data.price < 0) {
+        if (data.price !== undefined && Number(data.price) < 0) {
             throw new Error("Preço não pode ser negativo.");
         }
 
@@ -53,7 +56,11 @@ class ItemService {
             throw new Error("Quantidade não pode ser negativa.");
         }
 
-        await item.update(data);
+        await item.update({
+            ...data,
+            price: data.price !== undefined ? Number(data.price) : item.price
+        });
+
         return item;
     }
 
@@ -74,17 +81,32 @@ class ItemService {
             throw new Error("Quantidade para adicionar deve ser maior que zero.");
         }
 
-        const item = await Item.findByPk(itemId);
+        const transaction = await sequelize.transaction();
 
-        if (!item) {
-            throw new Error("Item não encontrado.");
+        try {
+            const item = await Item.findByPk(itemId, {
+                transaction,
+                lock: transaction.LOCK.UPDATE
+            });
+
+            if (!item) {
+                throw new Error("Item não encontrado.");
+            }
+
+            await item.update(
+                {
+                    quantity: item.quantity + quantity
+                },
+                { transaction }
+            );
+
+            await transaction.commit();
+            return item;
+
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
         }
-
-        await item.update({
-            quantity: item.quantity + quantity
-        });
-
-        return item;
     }
 
     async removeStock(itemId: number, quantity: number) {
@@ -92,21 +114,36 @@ class ItemService {
             throw new Error("Quantidade para remover deve ser maior que zero.");
         }
 
-        const item = await Item.findByPk(itemId);
+        const transaction = await sequelize.transaction();
 
-        if (!item) {
-            throw new Error("Item não encontrado.");
+        try {
+            const item = await Item.findByPk(itemId, {
+                transaction,
+                lock: transaction.LOCK.UPDATE
+            });
+
+            if (!item) {
+                throw new Error("Item não encontrado.");
+            }
+
+            if (item.quantity < quantity) {
+                throw new Error("Estoque insuficiente.");
+            }
+
+            await item.update(
+                {
+                    quantity: item.quantity - quantity
+                },
+                { transaction }
+            );
+
+            await transaction.commit();
+            return item;
+
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
         }
-
-        if (item.quantity < quantity) {
-            throw new Error("Estoque insuficiente.");
-        }
-
-        await item.update({
-            quantity: item.quantity - quantity
-        });
-
-        return item;
     }
 }
 

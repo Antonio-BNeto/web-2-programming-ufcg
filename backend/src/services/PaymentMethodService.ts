@@ -23,7 +23,7 @@ class PaymentMethodService {
 
       const paymentMethod = await PaymentMethod.create(
         {
-          user_id: userId,
+          userId,
           type,
         },
         { transaction }
@@ -106,7 +106,7 @@ class PaymentMethodService {
 
   async getUserPaymentMethods(userId: number) {
     return await PaymentMethod.findAll({
-      where: { user_id: userId },
+      where: { userId },
       include: [Pix, BankAccount, Card],
     });
   }
@@ -130,7 +130,7 @@ class PaymentMethodService {
       throw new Error("Método de pagamento não encontrado.");
     }
 
-    if (paymentMethod.user_id !== userId) {
+    if (paymentMethod.userId !== userId) {
       throw new Error("Acesso negado.");
     }
 

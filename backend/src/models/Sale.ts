@@ -1,6 +1,5 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "../config/database";
-import User from "./User";
 
 export interface SaleAttributes {
     id: number;
@@ -30,7 +29,7 @@ Sale.init(
             primaryKey: true,
         },
         valueTotal: {
-            type: DataTypes.FLOAT,
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
         },
         description: {

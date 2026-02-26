@@ -7,28 +7,25 @@ import { PaymentRequest } from "../dto/payment/PaymentRequest.dto";
 
 class PaymentService {
 
-  /**
-   * Busca pagamentos com trava de segurança por usuário.
-   */
-  async getPaymentsPaginated(userId: number, isAdmin: boolean, page: number, limit: number) {
-    const options: any = {
+  async getPaymentsPaginated(
+    userId: number,
+    isAdmin: boolean,
+    page: number,
+    limit: number
+  ) {
+    return await paginate(Payment, page, limit, {
       include: [
         {
           model: Sale,
-          as: 'sale', // Deve ser o mesmo alias definido em setupAssociations
-          attributes: ['id', 'user_id', 'description', 'valueTotal'],
-          // Trava de segurança: se não for admin, filtra pelo dono da venda
-          where: isAdmin ? {} : { user_id: userId }
+          as: "sale",
+          attributes: ["id", "userId", "description", "valueTotal"],
+          where: isAdmin ? {} : { userId }
         }
-      ]
-    };
-
-    return await paginate(Payment, page, limit, options);
+      ],
+      order: [["id", "DESC"]]
+    });
   }
 
-  /**
-   * Cria um novo pagamento com validação de saldo e concorrência (Lock).
-   */
   async createPayment(data: PaymentRequest) {
     const { saleId, paymentMethodId, value } = data;
     const transaction = await sequelize.transaction();
@@ -48,22 +45,29 @@ class PaymentService {
       }
 
       const paymentMethod = await PaymentMethod.findByPk(paymentMethodId, { transaction });
+
       if (!paymentMethod) {
         throw new Error("Método de pagamento não encontrado.");
       }
 
-      // Calcula quanto já foi pago
       const existingPayments = await Payment.findAll({
         where: { saleId },
-        transaction
+        transaction,
+        lock: transaction.LOCK.UPDATE
       });
 
-      const totalPaidSoFar = existingPayments.reduce((sum, p) => sum + p.value, 0);
-      const remainingAmount = sale.valueTotal - totalPaidSoFar;
+      const totalPaidSoFar = existingPayments.reduce(
+        (sum, p) => sum + Number(p.value),
+        0
+      );
 
-      // Usando uma margem pequena para lidar com floats se necessário
-      if (value > (remainingAmount + 0.01)) {
-        throw new Error(`Valor excede o saldo restante: R$ ${remainingAmount.toFixed(2)}`);
+      const saleTotal = Number(sale.valueTotal);
+      const remainingAmount = saleTotal - totalPaidSoFar;
+
+      if (value > remainingAmount + 0.01) {
+        throw new Error(
+          `Valor excede o saldo restante: R$ ${remainingAmount.toFixed(2)}`
+        );
       }
 
       const payment = await Payment.create(
@@ -71,17 +75,11 @@ class PaymentService {
           saleId,
           paymentMethodId,
           value,
-          status: "PAID", // Ou PENDING, dependendo da sua regra de negócio
+          status: "PAID",
           paymentDate: new Date()
         },
         { transaction }
       );
-
-      // Lógica automática: Se atingiu o total, atualiza a venda
-      if (Math.abs(remainingAmount - value) < 0.01) {
-        // await sale.update({ status: 'PAID' }, { transaction }); 
-        // Descomente acima quando tiver o campo status em Sale
-      }
 
       await transaction.commit();
       return payment;
@@ -92,16 +90,19 @@ class PaymentService {
     }
   }
 
-  /**
-   * Busca pagamento por ID validando a propriedade (Ownership).
-   */
-  async getPaymentById(paymentId: number, userId: number, isAdmin: boolean) {
+  async getPaymentById(
+    paymentId: number,
+    userId: number,
+    isAdmin: boolean
+  ) {
     const payment = await Payment.findByPk(paymentId, {
-      include: [{
-        model: Sale,
-        as: 'sale',
-        where: isAdmin ? {} : { user_id: userId }
-      }]
+      include: [
+        {
+          model: Sale,
+          as: "sale",
+          where: isAdmin ? {} : { userId }
+        }
+      ]
     });
 
     if (!payment) {
@@ -111,19 +112,36 @@ class PaymentService {
     return payment;
   }
 
-  /**
-   * Remove pagamento e reverte o processo dentro de uma transação.
-   */
-  async deletePayment(paymentId: number, userId: number, isAdmin: boolean) {
+  async deletePayment(
+    paymentId: number,
+    userId: number,
+    isAdmin: boolean
+  ) {
     const transaction = await sequelize.transaction();
 
     try {
-      const payment = await this.getPaymentById(paymentId, userId, isAdmin);
+      const payment = await Payment.findByPk(paymentId, {
+        include: [
+          {
+            model: Sale,
+            as: "sale",
+            where: isAdmin ? {} : { userId }
+          }
+        ],
+        transaction,
+        lock: transaction.LOCK.UPDATE
+      });
+
+      if (!payment) {
+        throw new Error("Pagamento não encontrado ou acesso negado.");
+      }
 
       await payment.destroy({ transaction });
+
       await transaction.commit();
 
       return { message: "Pagamento removido com sucesso." };
+
     } catch (error) {
       await transaction.rollback();
       throw error;
