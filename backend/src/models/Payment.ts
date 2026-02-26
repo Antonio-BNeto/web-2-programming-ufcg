@@ -1,5 +1,12 @@
-import { Model, DataTypes, Optional } from "sequelize";
+import {
+  Model,
+  DataTypes,
+  Optional,
+  NonAttribute,
+  ForeignKey
+} from "sequelize";
 import sequelize from "../config/database";
+import Sale from "./Sale";
 
 export type PaymentStatus = "PAID" | "PENDING" | "CANCELLED";
 
@@ -8,23 +15,30 @@ export interface PaymentAttributes {
   saleId: number;
   paymentMethodId: number;
   status: PaymentStatus;
-  paymentDate: Date | null;
+  paymentDate: Date;
   value: number;
 }
 
 export interface PaymentCreationAttributes
-  extends Optional<PaymentAttributes, "id" | "paymentDate"> {}
+  extends Optional<PaymentAttributes, "id"> {}
 
 class Payment
   extends Model<PaymentAttributes, PaymentCreationAttributes>
   implements PaymentAttributes
 {
   public id!: number;
-  public saleId!: number;
+
+  public saleId!: ForeignKey<Sale["id"]>;
+
   public paymentMethodId!: number;
+
   public status!: PaymentStatus;
-  public paymentDate!: Date | null;
+
+  public paymentDate!: Date;
+
   public value!: number;
+
+  public sale?: NonAttribute<Sale>;
 }
 
 Payment.init(
@@ -54,7 +68,7 @@ Payment.init(
 
     paymentDate: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
       field: "data_pagamento",
     },
 
@@ -69,5 +83,10 @@ Payment.init(
     timestamps: false,
   }
 );
+
+Payment.belongsTo(Sale, {
+  foreignKey: "saleId",
+  as: "sale",
+});
 
 export default Payment;

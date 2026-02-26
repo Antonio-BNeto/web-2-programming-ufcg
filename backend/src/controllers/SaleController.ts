@@ -23,25 +23,17 @@ export class SaleController extends Controller {
     @Body() requestBody: SaleCreateRequest,
     @Request() request: AuthenticatedRequest
   ): Promise<SaleResponse> {
-    try {
-      const userId = request.user.id;
 
-      const sale = await SaleService.createSale(
-        userId,
-        requestBody.description,
-        requestBody.items
-      );
+    const userId = request.user.id;
 
-      this.setStatus(201);
-      return sale.get({ plain: true }) as SaleResponse;
+    const sale = await SaleService.createSale(
+      userId,
+      requestBody.description,
+      requestBody.items
+    );
 
-    } catch (err: any) {
-      this.setStatus(err.message.includes("Estoque") ? 400 : 500);
-      throw {
-        message: "Erro ao criar venda",
-        error: err.message
-      };
-    }
+    this.setStatus(201);
+    return sale;
   }
 
   @Get()
@@ -51,9 +43,12 @@ export class SaleController extends Controller {
     @Query() page: number = 1,
     @Query() limit: number = 10
   ): Promise<PaginatedResponse<SaleDetailResponse>> {
-    const userId = request.user.id;
 
-    return await SaleService.getSalesPaginated(userId, page, limit);
+    return await SaleService.getSalesPaginated(
+      request.user.id,
+      page,
+      limit
+    );
   }
 
   @Get("admin/all")
@@ -62,6 +57,7 @@ export class SaleController extends Controller {
     @Query() page: number = 1,
     @Query() limit: number = 10
   ): Promise<PaginatedResponse<SaleDetailResponse>> {
+
     return await SaleService.getAllSalesPaginatedAdmin(page, limit);
   }
 
@@ -73,17 +69,7 @@ export class SaleController extends Controller {
     @Request() request: AuthenticatedRequest
   ): Promise<SaleDetailResponse> {
 
-    try {
-      const userId = request.user.id;
-
-      const sale = await SaleService.getSaleById(id, userId);
-
-      return sale.get({ plain: true }) as SaleDetailResponse;
-
-    } catch (err: any) {
-      this.setStatus(404);
-      throw { message: err.message };
-    }
+    return await SaleService.getSaleById(id, request.user.id);
   }
 
   @Put("{id}")
@@ -96,27 +82,10 @@ export class SaleController extends Controller {
     @Request() request: AuthenticatedRequest
   ): Promise<SaleResponse> {
 
-    try {
-      const userId = request.user.id;
-
-      const updated = await SaleService.updateSale(
-        id,
-        userId,
-        requestBody
-      );
-
-      return updated.get({ plain: true }) as SaleResponse;
-
-    } catch (err: any) {
-
-      if (err.message.includes("não encontrada") ||
-        err.message.includes("acesso")) {
-        this.setStatus(404);
-      } else {
-        this.setStatus(400);
-      }
-
-      throw { message: err.message };
-    }
+    return await SaleService.updateSale(
+      id,
+      request.user.id,
+      requestBody
+    );
   }
 }

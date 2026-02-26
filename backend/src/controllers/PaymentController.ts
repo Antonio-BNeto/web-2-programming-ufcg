@@ -1,104 +1,211 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Route,
-  Body,
-  Path,
-  SuccessResponse,
-  Response,
-  Tags,
-  Security,
-  Request,
-  Query
-} from "tsoa";
-
-import { ErrorResponse, MessageResponse } from "../types/responses";
-import { AuthenticatedRequest } from "../types/auth";
+import sequelize from "../config/database";
+import Payment from "../models/Payment";
+import Sale from "../models/Sale";
+import PaymentMethod from "../models/PaymentMethod";
+import { paginate } from "../utils/pagination";
 import { PaymentRequest } from "../dto/payment/PaymentRequest.dto";
-import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
-import PaymentService from "../services/PaymentService";
 import { PaymentResponse } from "../dto/payment/PaymentResponse.dto";
+import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
 
-@Route("payments")
-@Tags("Pagamentos")
-@Security("jwt")
-export class PaymentController extends Controller {
+class PaymentService {
 
-  // ✅ CREATE
-  @Post()
-  @SuccessResponse(201, "Criado com sucesso")
-  @Response<ErrorResponse>(400, "Erro ao criar pagamento")
-  public async create(
-    @Body() requestBody: PaymentRequest,
-    @Request() request: AuthenticatedRequest
-  ): Promise<PaymentResponse> {
-    try {
-      const payment = await PaymentService.createPayment(requestBody);
-
-      this.setStatus(201);
-      return payment.get({ plain: true }) as PaymentResponse;
-
-    } catch (error: any) {
-      this.setStatus(400);
-      throw {
-        message: "Erro ao criar pagamento",
-        error: error.message
-      };
-    }
-  }
-
-  // ✅ FIND ALL (já estava correto)
-  @Get()
-  public async findAll(
-    @Request() request: AuthenticatedRequest,
-    @Query() page: number = 1,
-    @Query() limit: number = 10
-  ): Promise<PaginatedResponse<PaymentResponse>> {
-
-    const userId = request.user.id;
-    const isAdmin = request.user.role === "ADMIN";
-
-    const result = await PaymentService.getPaymentsPaginated(
-      userId,
-      isAdmin,
-      page,
-      limit
-    );
-
+  // =========================
+  // 🔹 MAPPER (Model → DTO)
+  // =========================
+  private mapToResponse(payment: Payment): PaymentResponse {
     return {
-      ...result,
-      items: result.items.map(p =>
-        p.get({ plain: true })
-      ) as PaymentResponse[]
+      id: payment.id,
+      saleId: payment.saleId,
+      paymentMethodId: payment.paymentMethodId,
+      value: Number(payment.value),
+      status: payment.status,
+      paymentDate: payment.paymentDate,
+      sale: payment.sale
+        ? {
+            id: payment.sale.id,
+            userId: payment.sale.userId,
+            description: payment.sale.description,
+            valueTotal: payment.sale.valueTotal
+          }
+        : undefined
     };
   }
 
-  // ✅ FIND BY ID
-  @Get("{id}")
-  @Response<MessageResponse>(404, "Não encontrado")
-  public async findById(
-    @Path() id: number,
-    @Request() request: AuthenticatedRequest
+  // =========================
+  // 🔹 PAGINAÇÃO
+  // =========================
+  async getPaymentsPaginated(
+    userId: number,
+    isAdmin: boolean,
+    page: number,
+    limit: number
+  ): Promise<PaginatedResponse<PaymentResponse>> {
+
+    const result = await paginate(Payment, page, limit, {
+      include: [
+        {
+          model: Sale,
+          as: "sale",
+          attributes: ["id", "userId", "description", "valueTotal"],
+          where: isAdmin ? {} : { userId }
+        }
+      ],
+      order: [["id", "DESC"]]
+    });
+
+    return {
+      totalItems: result.totalItems,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
+      items: result.items.map((p: Payment) =>
+        this.mapToResponse(p)
+      )
+    };
+  }
+
+  // =========================
+  // 🔹 CREATE PAYMENT
+  // =========================
+  async createPayment(
+    data: PaymentRequest,
+    userId: number
   ): Promise<PaymentResponse> {
 
-    try {
-      const userId = request.user.id;
-      const isAdmin = request.user.role === "ADMIN";
+    const { saleId, paymentMethodId, value } = data;
+    const transaction = await sequelize.transaction();
 
-      const payment = await PaymentService.getPaymentById(
-        id,
-        userId,
-        isAdmin
+    try {
+      if (value <= 0) {
+        throw new Error("Valor do pagamento deve ser maior que zero.");
+      }
+
+      const sale = await Sale.findByPk(saleId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE
+      });
+
+      if (!sale) {
+        throw new Error("Venda não encontrada.");
+      }
+
+      // 🔒 Se não for admin, só pode pagar própria venda
+      if (sale.userId !== userId) {
+        throw new Error("Acesso negado.");
+      }
+
+      const paymentMethod = await PaymentMethod.findByPk(paymentMethodId, {
+        transaction
+      });
+
+      if (!paymentMethod) {
+        throw new Error("Método de pagamento não encontrado.");
+      }
+
+      const existingPayments = await Payment.findAll({
+        where: { saleId },
+        transaction,
+        lock: transaction.LOCK.UPDATE
+      });
+
+      const totalPaidSoFar = existingPayments.reduce(
+        (sum, p) => sum + Number(p.value),
+        0
       );
 
-      return payment.get({ plain: true }) as PaymentResponse;
+      const saleTotal = Number(sale.valueTotal);
+      const remainingAmount = saleTotal - totalPaidSoFar;
 
-    } catch (error: any) {
-      this.setStatus(404);
-      throw {
-        message: error.message
-      };
+      if (value > remainingAmount + 0.01) {
+        throw new Error(
+          `Valor excede o saldo restante: R$ ${remainingAmount.toFixed(2)}`
+        );
+      }
+
+      const payment = await Payment.create(
+        {
+          saleId,
+          paymentMethodId,
+          value,
+          status: "PAID",
+          paymentDate: new Date()
+        },
+        { transaction }
+      );
+
+      await transaction.commit();
+
+      return this.mapToResponse(payment);
+
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  // =========================
+  // 🔹 GET BY ID
+  // =========================
+  async getPaymentById(
+    paymentId: number,
+    userId: number,
+    isAdmin: boolean
+  ): Promise<PaymentResponse> {
+
+    const payment = await Payment.findByPk(paymentId, {
+      include: [
+        {
+          model: Sale,
+          as: "sale",
+          where: isAdmin ? {} : { userId }
+        }
+      ]
+    });
+
+    if (!payment) {
+      throw new Error("Pagamento não encontrado ou acesso negado.");
+    }
+
+    return this.mapToResponse(payment);
+  }
+
+  // =========================
+  // 🔹 DELETE
+  // =========================
+  async deletePayment(
+    paymentId: number,
+    userId: number,
+    isAdmin: boolean
+  ) {
+    const transaction = await sequelize.transaction();
+
+    try {
+      const payment = await Payment.findByPk(paymentId, {
+        include: [
+          {
+            model: Sale,
+            as: "sale",
+            where: isAdmin ? {} : { userId }
+          }
+        ],
+        transaction,
+        lock: transaction.LOCK.UPDATE
+      });
+
+      if (!payment) {
+        throw new Error("Pagamento não encontrado ou acesso negado.");
+      }
+
+      await payment.destroy({ transaction });
+
+      await transaction.commit();
+
+      return { message: "Pagamento removido com sucesso." };
+
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
     }
   }
 }
+
+export default new PaymentService();

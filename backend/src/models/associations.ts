@@ -7,11 +7,6 @@ import PaymentMethod from "./PaymentMethod";
 
 export const setupAssociations = () => {
 
-  /**
-   * =========================
-   * USER ↔ SALE (1:N)
-   * =========================
-   */
   User.hasMany(Sale, {
     foreignKey: "userId",
     as: "sales",
@@ -22,12 +17,6 @@ export const setupAssociations = () => {
     as: "user",
   });
 
-
-  /**
-   * =========================
-   * SALE ↔ PAYMENT (1:N)
-   * =========================
-   */
   Sale.hasMany(Payment, {
     foreignKey: "saleId",
     as: "payments",
@@ -35,16 +24,11 @@ export const setupAssociations = () => {
 
   Payment.belongsTo(Sale, {
     foreignKey: "saleId",
-    as: "sale",
+    as: "parentSale",
   });
 
 
-  /**
-   * =========================
-   * SALE ↔ ITEM (N:N)
-   * Through: SaleItem
-   * =========================
-   */
+
   Sale.belongsToMany(Item, {
     through: SaleItem,
     foreignKey: "saleId",
@@ -60,11 +44,6 @@ export const setupAssociations = () => {
   });
 
 
-  /**
-   * =========================
-   * SALE ↔ SALE_ITEM (1:N)
-   * =========================
-   */
   Sale.hasMany(SaleItem, {
     foreignKey: "saleId",
     as: "saleItems",
@@ -72,15 +51,10 @@ export const setupAssociations = () => {
 
   SaleItem.belongsTo(Sale, {
     foreignKey: "saleId",
-    as: "sale",
+    as: "saleReference",
   });
 
 
-  /**
-   * =========================
-   * ITEM ↔ SALE_ITEM (1:N)
-   * =========================
-   */
   Item.hasMany(SaleItem, {
     foreignKey: "itemId",
     as: "saleItems",
@@ -92,11 +66,6 @@ export const setupAssociations = () => {
   });
 
 
-  /**
-   * =========================
-   * USER ↔ PAYMENT METHOD (1:N)
-   * =========================
-   */
   User.hasMany(PaymentMethod, {
     foreignKey: "userId",
     as: "paymentMethods",
@@ -108,11 +77,6 @@ export const setupAssociations = () => {
   });
 
 
-  /**
-   * =========================
-   * PAYMENT METHOD ↔ PAYMENT (1:N)
-   * =========================
-   */
   PaymentMethod.hasMany(Payment, {
     foreignKey: "paymentMethodId",
     as: "payments",

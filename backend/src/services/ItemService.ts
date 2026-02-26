@@ -35,11 +35,26 @@ class ItemService {
         return item;
     }
 
-    async getAllItems() {
-        return await Item.findAll({
-            order: [["id", "DESC"]]
-        });
-    }
+    async getAllItems(page: number = 1, limit: number = 10) {
+    if (page < 1) page = 1;
+    if (limit < 1) limit = 10;
+
+    const offset = (page - 1) * limit;
+
+    const { rows, count } = await Item.findAndCountAll({
+        order: [["id", "DESC"]],
+        limit,
+        offset
+    });
+
+    return {
+        items: rows,
+        total: count,
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit)
+    };
+}
 
     async updateItem(itemId: number, data: Partial<ItemCreationAttributes>) {
         const item = await Item.findByPk(itemId);

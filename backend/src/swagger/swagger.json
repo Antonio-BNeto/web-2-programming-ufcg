@@ -119,6 +119,36 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PaginatedResponse_UserResponseDTO_": {
+				"properties": {
+					"totalItems": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/UserResponseDTO"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalItems",
+					"totalPages",
+					"currentPage",
+					"items"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"MessageResponse": {
 				"properties": {
 					"message": {
@@ -316,116 +346,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"PaymentResponse": {
-				"properties": {
-					"saleId": {
-						"type": "number",
-						"format": "double",
-						"example": 1
-					},
-					"paymentMethodId": {
-						"type": "number",
-						"format": "double",
-						"example": 1
-					},
-					"status": {
-						"type": "string",
-						"example": "PENDING"
-					},
-					"value": {
-						"type": "number",
-						"format": "double",
-						"example": 150.5
-					},
-					"paymentDate": {
-						"type": "string",
-						"format": "date-time",
-						"nullable": true,
-						"example": "2026-02-03T23:00:00Z"
-					},
-					"id": {
-						"type": "number",
-						"format": "double",
-						"example": 1
-					}
-				},
-				"required": [
-					"saleId",
-					"paymentMethodId",
-					"status",
-					"value",
-					"id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"PaymentRequest": {
-				"properties": {
-					"saleId": {
-						"type": "number",
-						"format": "double",
-						"example": 1
-					},
-					"paymentMethodId": {
-						"type": "number",
-						"format": "double",
-						"example": 1
-					},
-					"status": {
-						"type": "string",
-						"example": "PENDING"
-					},
-					"value": {
-						"type": "number",
-						"format": "double",
-						"example": 150.5
-					},
-					"paymentDate": {
-						"type": "string",
-						"format": "date-time",
-						"nullable": true,
-						"example": "2026-02-03T23:00:00Z"
-					}
-				},
-				"required": [
-					"saleId",
-					"paymentMethodId",
-					"status",
-					"value"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"PaginatedResponse_PaymentResponse_": {
-				"properties": {
-					"totalItems": {
-						"type": "number",
-						"format": "double"
-					},
-					"totalPages": {
-						"type": "number",
-						"format": "double"
-					},
-					"currentPage": {
-						"type": "number",
-						"format": "double"
-					},
-					"items": {
-						"items": {
-							"$ref": "#/components/schemas/PaymentResponse"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"totalItems",
-					"totalPages",
-					"currentPage",
-					"items"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"ItemResponse": {
 				"properties": {
 					"name": {
@@ -490,6 +410,60 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"PaginatedResponse_ItemResponse_": {
+				"properties": {
+					"totalItems": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/ItemResponse"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalItems",
+					"totalPages",
+					"currentPage",
+					"items"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_ItemRequest_": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"example": "Teclado Mecânico"
+					},
+					"description": {
+						"type": "string",
+						"example": "Teclado RGB switch blue"
+					},
+					"price": {
+						"type": "number",
+						"format": "double",
+						"example": 250.5
+					},
+					"quantity": {
+						"type": "number",
+						"format": "double",
+						"example": 10
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
 			}
 		},
 		"securitySchemes": {
@@ -577,8 +551,8 @@
 							}
 						}
 					},
-					"500": {
-						"description": "Erro interno",
+					"400": {
+						"description": "Erro de validação",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -612,10 +586,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/UserResponseDTO"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/PaginatedResponse_UserResponseDTO_"
 								}
 							}
 						}
@@ -625,7 +596,28 @@
 					"Usuários"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/users/{id}": {
@@ -677,7 +669,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/MessageResponse"
+									"$ref": "#/components/schemas/UserResponseDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Erro de validação",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -688,16 +690,6 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/MessageResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "Erro interno",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -728,6 +720,46 @@
 						}
 					}
 				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Usuários"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/sales": {
@@ -990,143 +1022,6 @@
 				}
 			}
 		},
-		"/payments": {
-			"post": {
-				"operationId": "Create",
-				"responses": {
-					"201": {
-						"description": "Criado com sucesso",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/PaymentResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Erro ao criar pagamento",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Pagamentos"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/PaymentRequest"
-							}
-						}
-					}
-				}
-			},
-			"get": {
-				"operationId": "FindAll",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/PaginatedResponse_PaymentResponse_"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Pagamentos"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "query",
-						"name": "page",
-						"required": false,
-						"schema": {
-							"default": 1,
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "limit",
-						"required": false,
-						"schema": {
-							"default": 10,
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/payments/{id}": {
-			"get": {
-				"operationId": "FindById",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/PaymentResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Não encontrado",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/MessageResponse"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Pagamentos"
-				],
-				"security": [
-					{
-						"jwt": []
-					}
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
 		"/items": {
 			"post": {
 				"operationId": "Create",
@@ -1141,8 +1036,8 @@
 							}
 						}
 					},
-					"500": {
-						"description": "Erro interno",
+					"400": {
+						"description": "Erro de validação",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -1180,10 +1075,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/ItemResponse"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/PaginatedResponse_ItemResponse_"
 								}
 							}
 						}
@@ -1193,7 +1085,28 @@
 					"Itens"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/items/{id}": {
@@ -1285,7 +1198,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/ItemRequest"
+								"$ref": "#/components/schemas/Partial_ItemRequest_"
 							}
 						}
 					}
