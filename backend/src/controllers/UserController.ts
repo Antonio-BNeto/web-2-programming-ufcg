@@ -10,7 +10,9 @@ import {
   SuccessResponse,
   Response,
   Tags,
-  Query
+  Query,
+  Security,
+  Request
 } from "tsoa";
 
 import { ErrorResponse, MessageResponse } from "../types/responses";
@@ -22,6 +24,7 @@ import {
 
 import UserService from "../services/UserService";
 import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
+import { AuthenticatedRequest } from "../types/auth";
 
 @Route("users")
 @Tags("Usuários")
@@ -36,9 +39,7 @@ export class UserController extends Controller {
 
     try {
       const user = await UserService.createUser(requestBody);
-
       this.setStatus(201);
-
       return user.get({ plain: true }) as UserResponseDTO;
 
     } catch (error: any) {
@@ -48,6 +49,7 @@ export class UserController extends Controller {
   }
 
   @Get()
+  @Security("jwt", ["ADMIN"])
   public async getAll(
     @Query() page: number = 1,
     @Query() limit: number = 10
@@ -57,40 +59,66 @@ export class UserController extends Controller {
   }
 
   @Get("{id}")
+  @Security("jwt")
   @Response<MessageResponse>(404, "Não encontrado")
   public async getById(
-    @Path() id: number
+    @Path() id: number,
+    @Request() request: AuthenticatedRequest
   ): Promise<UserResponseDTO> {
 
     try {
+      if (
+        request.user.role !== "ADMIN" &&
+        request.user.id !== id
+      ) {
+        this.setStatus(403);
+        throw { message: "Acesso negado." };
+      }
+
       const user = await UserService.getUserById(id);
       return user.get({ plain: true }) as UserResponseDTO;
 
     } catch (error: any) {
-      this.setStatus(404);
+      this.setStatus(this.getStatus() || 404);
       throw { message: error.message };
     }
   }
 
   @Put("{id}")
+  @Security("jwt")
   @Response<MessageResponse>(404, "Não encontrado")
   @Response<ErrorResponse>(400, "Erro de validação")
   public async update(
     @Path() id: number,
-    @Body() requestBody: UpdateUserDTO
+    @Body() requestBody: UpdateUserDTO,
+    @Request() request: AuthenticatedRequest
   ): Promise<UserResponseDTO> {
 
     try {
-      const updated = await UserService.updateUser(id, requestBody);
+      if (
+        request.user.role !== "ADMIN" &&
+        request.user.id !== id
+      ) {
+        this.setStatus(403);
+        throw { message: "Acesso negado." };
+      }
+
+      const updated = await UserService.updateUser(
+        id,
+        requestBody,
+        request.user.role
+      );
+
       return updated.get({ plain: true }) as UserResponseDTO;
 
     } catch (error: any) {
-      this.setStatus(400);
+      this.setStatus(this.getStatus() || 400);
       throw { message: error.message };
     }
   }
 
   @Delete("{id}")
+  @Security("jwt", ["ADMIN"])
   @Response<MessageResponse>(404, "Não encontrado")
   public async delete(
     @Path() id: number

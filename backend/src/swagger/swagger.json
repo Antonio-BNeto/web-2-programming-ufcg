@@ -599,7 +599,13 @@
 				"description": "Make all properties in T optional"
 			}
 		},
-		"securitySchemes": {}
+		"securitySchemes": {
+			"jwt": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		}
 	},
 	"info": {
 		"title": "backend",
@@ -1165,7 +1171,7 @@
 					}
 				},
 				"tags": [
-					"Pagamentos"
+					"Pagamentos-TESTE-999"
 				],
 				"security": [
 					{
@@ -1220,7 +1226,7 @@
 					}
 				},
 				"tags": [
-					"Pagamentos"
+					"Pagamentos-TESTE-999"
 				],
 				"security": [
 					{
@@ -1266,7 +1272,7 @@
 					}
 				},
 				"tags": [
-					"Pagamentos"
+					"Pagamentos-TESTE-999"
 				],
 				"security": [
 					{
@@ -1310,7 +1316,7 @@
 					}
 				},
 				"tags": [
-					"Pagamentos"
+					"Pagamentos-TESTE-999"
 				],
 				"security": [
 					{

@@ -72,6 +72,30 @@ export class SaleController extends Controller {
     return await SaleService.getSaleById(id, request.user.id);
   }
 
+  @Get("user/{userId}")
+  @Security("jwt")
+  public async getAllByUser(
+    @Path() userId: number,
+    @Request() request: AuthenticatedRequest,
+    @Query() page: number = 1,
+    @Query() limit: number = 10
+  ): Promise<PaginatedResponse<SaleDetailResponse>> {
+
+    if (
+      request.user.role !== "ADMIN" &&
+      request.user.id !== userId
+    ) {
+      this.setStatus(403);
+      throw { message: "Acesso negado." };
+    }
+
+    return await SaleService.getSalesPaginated(
+      userId,
+      page,
+      limit
+    );
+  }
+
   @Put("{id}")
   @Security("jwt")
   @Response<MessageResponse>(404, "Venda não encontrada ou acesso negado")

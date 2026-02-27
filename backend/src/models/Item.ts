@@ -7,20 +7,21 @@ export interface ItemAttributes {
     description: string;
     price: number;
     quantity: number;
+    userId: number;
 }
 
 export interface ItemCreationAttributes
-    extends Optional<ItemAttributes, "id"> {}
+    extends Optional<ItemAttributes, "id"> { }
 
 class Item
     extends Model<ItemAttributes, ItemCreationAttributes>
-    implements ItemAttributes
-{
+    implements ItemAttributes {
     public id!: number;
     public name!: string;
     public description!: string;
     public price!: number;
     public quantity!: number;
+    public userId!: number;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -49,6 +50,15 @@ Item.init(
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,
+        },
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "users",
+                key: "id",
+            },
+            onDelete: "CASCADE",
         },
     },
     {

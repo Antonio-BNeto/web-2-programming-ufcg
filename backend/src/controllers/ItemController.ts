@@ -11,30 +11,15 @@ import {
   Response,
   Tags,
   Security,
-  Query
+  Query,
+  Request
 } from "tsoa";
 
 import ItemService from "../services/ItemService";
 import { ErrorResponse, MessageResponse } from "../types/responses";
 import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
-
-interface ItemRequest {
-  /** @example "Teclado Mecânico" */
-  name: string;
-
-  /** @example "Teclado RGB switch blue" */
-  description: string;
-
-  /** @example 250.50 */
-  price: number;
-
-  /** @example 10 */
-  quantity: number;
-}
-
-interface ItemResponse extends ItemRequest {
-  id: number;
-}
+import { ItemRequest, ItemResponse } from "../dto/item";
+import { AuthenticatedRequest } from "../types/auth";
 
 @Route("items")
 @Tags("Itens")
@@ -45,10 +30,14 @@ export class ItemController extends Controller {
   @SuccessResponse(201, "Criado com sucesso")
   @Response<ErrorResponse>(400, "Erro de validação")
   public async create(
-    @Body() requestBody: ItemRequest
+    @Body() requestBody: ItemRequest,
+    @Request() request: AuthenticatedRequest
   ): Promise<ItemResponse> {
 
-    const item = await ItemService.createItem(requestBody);
+    const item = await ItemService.createItem({
+      ...requestBody,
+      userId: request.user.id,
+    });
     this.setStatus(201);
     return item.toJSON() as ItemResponse;
   }

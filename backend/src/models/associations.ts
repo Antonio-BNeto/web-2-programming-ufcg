@@ -36,6 +36,16 @@ export const setupAssociations = () => {
     as: "items",
   });
 
+  User.hasMany(Item, {
+    foreignKey: "userId",
+    as: "items",
+  });
+
+  Item.belongsTo(User, {
+    foreignKey: "userId",
+    as: "owner",
+  });
+
   Item.belongsToMany(Sale, {
     through: SaleItem,
     foreignKey: "itemId",

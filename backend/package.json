@@ -4,16 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "swagger": "tsoa spec && tsoa routes",
-    "predev": "rimraf dist",
-    "dev": "rimraf dist && tsoa spec && tsoa routes && ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsoa spec && tsc",
+    "clean": "rimraf dist src/swagger swagger.json",
+    "swagger": "tsoa spec-and-routes",
+    "predev": "npm run clean",
+    "dev": "tsoa spec-and-routes && ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "npm run clean && tsoa spec-and-routes && tsc",
     "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tsoa/runtime": "^6.6.0",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
