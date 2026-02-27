@@ -4,7 +4,6 @@ import PaymentService from '../../src/services/PaymentService';
 import { AppError } from '@/errors/AppError';
 import { generateTestToken } from '../helpers/auth';
 
-// ✅ jest.mock no topo — intercepta antes de qualquer importação
 jest.mock('../../src/services/PaymentService');
 
 const mockPayment = {
@@ -12,7 +11,6 @@ const mockPayment = {
   saleId: 1,
   paymentMethodId: 2,
   status: "PAID" as const,
-  paymentDate: new Date("2024-01-15T10:00:00.000Z"),
   value: 150.75,
 };
 
@@ -29,7 +27,7 @@ describe('Payment Integration', () => {
   const userToken = generateTestToken(1, 'USER');
 
   afterEach(() => {
-    jest.clearAllMocks(); // ✅ clearAllMocks em vez de restoreAllMocks com jest.mock
+    jest.clearAllMocks();
   });
 
   describe('GET /payments', () => {
@@ -106,7 +104,6 @@ describe('Payment Integration', () => {
       saleId: 1,
       paymentMethodId: 2,
       value: 150.75,
-      paymentDate: '2024-01-15T10:00:00.000Z',
     };
 
     it('deve criar um pagamento com sucesso', async () => {
