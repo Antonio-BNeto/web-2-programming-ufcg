@@ -357,6 +357,188 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PaymentMethodResponse": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"PIX",
+							"CARD",
+							"BANK_ACCOUNT"
+						]
+					},
+					"main": {
+						"type": "boolean"
+					},
+					"Pix": {
+						"properties": {
+							"key": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"key"
+						],
+						"type": "object"
+					},
+					"Card": {
+						"properties": {
+							"expiration_year": {
+								"type": "number",
+								"format": "double"
+							},
+							"expiration_month": {
+								"type": "number",
+								"format": "double"
+							},
+							"card_number": {
+								"type": "string"
+							},
+							"holder_name": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"expiration_year",
+							"expiration_month",
+							"card_number",
+							"holder_name"
+						],
+						"type": "object"
+					},
+					"BankAccount": {
+						"properties": {
+							"account_type": {
+								"type": "string"
+							},
+							"account_number": {
+								"type": "string"
+							},
+							"agency": {
+								"type": "string"
+							},
+							"bank_name": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"account_type",
+							"account_number",
+							"agency",
+							"bank_name"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"id",
+					"userId",
+					"type",
+					"main"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PixData": {
+				"properties": {
+					"key": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"key"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CardData": {
+				"properties": {
+					"holder_name": {
+						"type": "string"
+					},
+					"card_number": {
+						"type": "string"
+					},
+					"expiration_month": {
+						"type": "number",
+						"format": "double"
+					},
+					"expiration_year": {
+						"type": "number",
+						"format": "double"
+					},
+					"cvv": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"holder_name",
+					"card_number",
+					"expiration_month",
+					"expiration_year",
+					"cvv"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BankAccountData": {
+				"properties": {
+					"bank_name": {
+						"type": "string"
+					},
+					"agency": {
+						"type": "string"
+					},
+					"account_number": {
+						"type": "string"
+					},
+					"account_type": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"bank_name",
+					"agency",
+					"account_number",
+					"account_type"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreatePaymentMethodRequest": {
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"PIX",
+							"CARD",
+							"BANK_ACCOUNT"
+						]
+					},
+					"pix": {
+						"$ref": "#/components/schemas/PixData"
+					},
+					"card": {
+						"$ref": "#/components/schemas/CardData"
+					},
+					"bankAccount": {
+						"$ref": "#/components/schemas/BankAccountData"
+					}
+				},
+				"required": [
+					"type"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"PaymentSaleResponse": {
 				"properties": {
 					"id": {
@@ -1235,6 +1417,159 @@
 						"required": false,
 						"schema": {
 							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/payment-methods": {
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"201": {
+						"description": "Criado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaymentMethodResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Métodos de Pagamento"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreatePaymentMethodRequest"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetUserMethods",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/PaymentMethodResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Métodos de Pagamento"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/payment-methods/{id}": {
+			"get": {
+				"operationId": "GetById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaymentMethodResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Métodos de Pagamento"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Métodos de Pagamento"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
 							"format": "double",
 							"type": "number"
 						}

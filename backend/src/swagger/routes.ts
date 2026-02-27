@@ -10,6 +10,8 @@ import { UserController } from './../controllers/UserController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { SaleController } from './../controllers/SaleController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { PaymentMethodController } from './../controllers/PaymentMethodController';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { PaymentController } from './../controllers/PaymentController';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { ItemController } from './../controllers/ItemController';
@@ -163,6 +165,62 @@ const models: TsoaRoute.Models = {
         "properties": {
             "description": {"dataType":"string"},
             "status": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["NEGOTIATING"]},{"dataType":"enum","enums":["CONFIRMED"]},{"dataType":"enum","enums":["PAID"]},{"dataType":"enum","enums":["CANCELLED"]}]},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PaymentMethodResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double","required":true},
+            "userId": {"dataType":"double","required":true},
+            "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["PIX"]},{"dataType":"enum","enums":["CARD"]},{"dataType":"enum","enums":["BANK_ACCOUNT"]}],"required":true},
+            "main": {"dataType":"boolean","required":true},
+            "Pix": {"dataType":"nestedObjectLiteral","nestedProperties":{"key":{"dataType":"string","required":true}}},
+            "Card": {"dataType":"nestedObjectLiteral","nestedProperties":{"expiration_year":{"dataType":"double","required":true},"expiration_month":{"dataType":"double","required":true},"card_number":{"dataType":"string","required":true},"holder_name":{"dataType":"string","required":true}}},
+            "BankAccount": {"dataType":"nestedObjectLiteral","nestedProperties":{"account_type":{"dataType":"string","required":true},"account_number":{"dataType":"string","required":true},"agency":{"dataType":"string","required":true},"bank_name":{"dataType":"string","required":true}}},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "PixData": {
+        "dataType": "refObject",
+        "properties": {
+            "key": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CardData": {
+        "dataType": "refObject",
+        "properties": {
+            "holder_name": {"dataType":"string","required":true},
+            "card_number": {"dataType":"string","required":true},
+            "expiration_month": {"dataType":"double","required":true},
+            "expiration_year": {"dataType":"double","required":true},
+            "cvv": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "BankAccountData": {
+        "dataType": "refObject",
+        "properties": {
+            "bank_name": {"dataType":"string","required":true},
+            "agency": {"dataType":"string","required":true},
+            "account_number": {"dataType":"string","required":true},
+            "account_type": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "CreatePaymentMethodRequest": {
+        "dataType": "refObject",
+        "properties": {
+            "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["PIX"]},{"dataType":"enum","enums":["CARD"]},{"dataType":"enum","enums":["BANK_ACCOUNT"]}],"required":true},
+            "pix": {"ref":"PixData"},
+            "card": {"ref":"CardData"},
+            "bankAccount": {"ref":"BankAccountData"},
         },
         "additionalProperties": false,
     },
@@ -642,6 +700,133 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'update',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPaymentMethodController_create: Record<string, TsoaRoute.ParameterSchema> = {
+                body: {"in":"body","name":"body","required":true,"ref":"CreatePaymentMethodRequest"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        };
+        app.post('/payment-methods',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(PaymentMethodController)),
+            ...(fetchMiddlewares<RequestHandler>(PaymentMethodController.prototype.create)),
+
+            async function PaymentMethodController_create(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPaymentMethodController_create, request, response });
+
+                const controller = new PaymentMethodController();
+
+              await templateService.apiHandler({
+                methodName: 'create',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: 201,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPaymentMethodController_getUserMethods: Record<string, TsoaRoute.ParameterSchema> = {
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        };
+        app.get('/payment-methods',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(PaymentMethodController)),
+            ...(fetchMiddlewares<RequestHandler>(PaymentMethodController.prototype.getUserMethods)),
+
+            async function PaymentMethodController_getUserMethods(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPaymentMethodController_getUserMethods, request, response });
+
+                const controller = new PaymentMethodController();
+
+              await templateService.apiHandler({
+                methodName: 'getUserMethods',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPaymentMethodController_getById: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        };
+        app.get('/payment-methods/:id',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(PaymentMethodController)),
+            ...(fetchMiddlewares<RequestHandler>(PaymentMethodController.prototype.getById)),
+
+            async function PaymentMethodController_getById(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPaymentMethodController_getById, request, response });
+
+                const controller = new PaymentMethodController();
+
+              await templateService.apiHandler({
+                methodName: 'getById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsPaymentMethodController_delete: Record<string, TsoaRoute.ParameterSchema> = {
+                id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+        };
+        app.delete('/payment-methods/:id',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(PaymentMethodController)),
+            ...(fetchMiddlewares<RequestHandler>(PaymentMethodController.prototype.delete)),
+
+            async function PaymentMethodController_delete(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsPaymentMethodController_delete, request, response });
+
+                const controller = new PaymentMethodController();
+
+              await templateService.apiHandler({
+                methodName: 'delete',
                 controller,
                 response,
                 next,
