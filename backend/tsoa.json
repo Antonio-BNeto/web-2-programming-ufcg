@@ -1,11 +1,13 @@
 {
   "entryFile": "src/index.ts",
   "noImplicitAdditionalProperties": "throw-on-extras",
-  "controllerPathGlobs": ["src/controllers/**/*Controller.ts"],
+  "controllerPathGlobs": [
+    "src/controllers/**/*Controller.ts"
+  ],
   "spec": {
-    "outputDirectory": "src/swagger",
+    "outputDirectory": "./src/swagger",
     "specVersion": 3,
-    "title": "Sales API",
+    "title": "Brasa API",
     "description": "API do sistema de vendas com geração automática via TSOA",
     "securityDefinitions": {
       "jwt": {

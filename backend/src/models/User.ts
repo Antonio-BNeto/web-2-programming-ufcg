@@ -1,6 +1,7 @@
-import {Model, DataTypes, Optional} from 'sequelize';
-import sequelize from '../config/database';
-import Sale from './Sale';
+import { Model, DataTypes, Optional } from "sequelize";
+import sequelize from "../config/database";
+
+export type UserRole = "USER" | "ADMIN";
 
 export interface UserAttributes {
     id: number;
@@ -9,11 +10,11 @@ export interface UserAttributes {
     name: string;
     email: string;
     password: string;
-    role: 'USER' | 'ADMIN'
+    role: UserRole;
 }
 
 export interface UserCreationAttributes
-    extends Optional<UserAttributes, "id"| "role"> {}
+    extends Optional<UserAttributes, "id" | "role"> {}
 
 class User
     extends Model<UserAttributes, UserCreationAttributes>
@@ -25,50 +26,52 @@ class User
     public name!: string;
     public email!: string;
     public password!: string;
-    public role!: 'USER' | 'ADMIN';
+    public role!: UserRole;
 }
-
 
 User.init(
     {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
-            primaryKey: true
+            primaryKey: true,
         },
         cpf: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true
+            unique: true,
         },
         phoneNumber: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
         },
         name: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
         },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true
+            unique: true,
+            validate: {
+                isEmail: true,
+            },
         },
         password: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
         },
         role: {
-            type: DataTypes.ENUM('USER', 'ADMIN'),
+            type: DataTypes.ENUM("USER", "ADMIN"),
             allowNull: false,
-            defaultValue: 'USER'
-        }
+            defaultValue: "USER",
+        },
     },
     {
         sequelize,
         tableName: "users",
-        timestamps: false
+        timestamps: false,
     }
-)
+);
 
 export default User;

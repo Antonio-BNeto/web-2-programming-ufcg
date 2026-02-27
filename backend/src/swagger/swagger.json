@@ -119,6 +119,36 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"PaginatedResponse_UserResponseDTO_": {
+				"properties": {
+					"totalItems": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/UserResponseDTO"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalItems",
+					"totalPages",
+					"currentPage",
+					"items"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"MessageResponse": {
 				"properties": {
 					"message": {
@@ -311,56 +341,242 @@
 					"description": {
 						"type": "string",
 						"example": "Nova descrição da venda"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"NEGOTIATING",
+							"CONFIRMED",
+							"PAID",
+							"CANCELLED"
+						],
+						"description": "Status da venda",
+						"example": "CONFIRMED"
 					}
 				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PaymentMethodResponse": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"userId": {
+						"type": "number",
+						"format": "double"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"PIX",
+							"CARD",
+							"BANK_ACCOUNT"
+						]
+					},
+					"main": {
+						"type": "boolean"
+					},
+					"Pix": {
+						"properties": {
+							"key": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"key"
+						],
+						"type": "object"
+					},
+					"Card": {
+						"properties": {
+							"expiration_year": {
+								"type": "number",
+								"format": "double"
+							},
+							"expiration_month": {
+								"type": "number",
+								"format": "double"
+							},
+							"card_number": {
+								"type": "string"
+							},
+							"holder_name": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"expiration_year",
+							"expiration_month",
+							"card_number",
+							"holder_name"
+						],
+						"type": "object"
+					},
+					"BankAccount": {
+						"properties": {
+							"account_type": {
+								"type": "string"
+							},
+							"account_number": {
+								"type": "string"
+							},
+							"agency": {
+								"type": "string"
+							},
+							"bank_name": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"account_type",
+							"account_number",
+							"agency",
+							"bank_name"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"id",
+					"userId",
+					"type",
+					"main"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PixData": {
+				"properties": {
+					"key": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"key"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CardData": {
+				"properties": {
+					"holder_name": {
+						"type": "string"
+					},
+					"card_number": {
+						"type": "string"
+					},
+					"expiration_month": {
+						"type": "number",
+						"format": "double"
+					},
+					"expiration_year": {
+						"type": "number",
+						"format": "double"
+					},
+					"cvv": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"holder_name",
+					"card_number",
+					"expiration_month",
+					"expiration_year",
+					"cvv"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BankAccountData": {
+				"properties": {
+					"bank_name": {
+						"type": "string"
+					},
+					"agency": {
+						"type": "string"
+					},
+					"account_number": {
+						"type": "string"
+					},
+					"account_type": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"bank_name",
+					"agency",
+					"account_number",
+					"account_type"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreatePaymentMethodRequest": {
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"PIX",
+							"CARD",
+							"BANK_ACCOUNT"
+						]
+					},
+					"pix": {
+						"$ref": "#/components/schemas/PixData"
+					},
+					"card": {
+						"$ref": "#/components/schemas/CardData"
+					},
+					"bankAccount": {
+						"$ref": "#/components/schemas/BankAccountData"
+					}
+				},
+				"required": [
+					"type"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PaymentSaleResponse": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"userId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"description": {
+						"type": "string",
+						"example": "Venda de periféricos gamer"
+					},
+					"valueTotal": {
+						"type": "number",
+						"format": "double",
+						"example": 250.5
+					}
+				},
+				"required": [
+					"id",
+					"userId",
+					"description",
+					"valueTotal"
+				],
 				"type": "object",
 				"additionalProperties": false
 			},
 			"PaymentResponse": {
 				"properties": {
-					"saleId": {
-						"type": "number",
-						"format": "double",
-						"example": 1
-					},
-					"paymentMethodId": {
-						"type": "number",
-						"format": "double",
-						"example": 1
-					},
-					"status": {
-						"type": "string",
-						"example": "PENDING"
-					},
-					"value": {
-						"type": "number",
-						"format": "double",
-						"example": 150.5
-					},
-					"paymentDate": {
-						"type": "string",
-						"format": "date-time",
-						"nullable": true,
-						"example": "2026-02-03T23:00:00Z"
-					},
 					"id": {
 						"type": "number",
 						"format": "double",
 						"example": 1
-					}
-				},
-				"required": [
-					"saleId",
-					"paymentMethodId",
-					"status",
-					"value",
-					"id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"PaymentRequest": {
-				"properties": {
+					},
 					"saleId": {
 						"type": "number",
 						"format": "double",
@@ -371,27 +587,31 @@
 						"format": "double",
 						"example": 1
 					},
-					"status": {
-						"type": "string",
-						"example": "PENDING"
-					},
 					"value": {
 						"type": "number",
 						"format": "double",
 						"example": 150.5
 					},
+					"status": {
+						"type": "string",
+						"example": "PAID"
+					},
 					"paymentDate": {
 						"type": "string",
 						"format": "date-time",
-						"nullable": true,
-						"example": "2026-02-03T23:00:00Z"
+						"example": "2026-02-26T12:00:00.000Z"
+					},
+					"sale": {
+						"$ref": "#/components/schemas/PaymentSaleResponse"
 					}
 				},
 				"required": [
+					"id",
 					"saleId",
 					"paymentMethodId",
+					"value",
 					"status",
-					"value"
+					"paymentDate"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -422,6 +642,32 @@
 					"totalPages",
 					"currentPage",
 					"items"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PaymentRequest": {
+				"properties": {
+					"saleId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"paymentMethodId": {
+						"type": "number",
+						"format": "double",
+						"example": 1
+					},
+					"value": {
+						"type": "number",
+						"format": "double",
+						"example": 150.5
+					}
+				},
+				"required": [
+					"saleId",
+					"paymentMethodId",
+					"value"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -490,6 +736,60 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"PaginatedResponse_ItemResponse_": {
+				"properties": {
+					"totalItems": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalPages": {
+						"type": "number",
+						"format": "double"
+					},
+					"currentPage": {
+						"type": "number",
+						"format": "double"
+					},
+					"items": {
+						"items": {
+							"$ref": "#/components/schemas/ItemResponse"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"totalItems",
+					"totalPages",
+					"currentPage",
+					"items"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Partial_ItemRequest_": {
+				"properties": {
+					"name": {
+						"type": "string",
+						"example": "Teclado Mecânico"
+					},
+					"description": {
+						"type": "string",
+						"example": "Teclado RGB switch blue"
+					},
+					"price": {
+						"type": "number",
+						"format": "double",
+						"example": 250.5
+					},
+					"quantity": {
+						"type": "number",
+						"format": "double",
+						"example": 10
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
 			}
 		},
 		"securitySchemes": {
@@ -577,8 +877,8 @@
 							}
 						}
 					},
-					"500": {
-						"description": "Erro interno",
+					"400": {
+						"description": "Erro de validação",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -612,10 +912,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/UserResponseDTO"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/PaginatedResponse_UserResponseDTO_"
 								}
 							}
 						}
@@ -624,8 +921,35 @@
 				"tags": [
 					"Usuários"
 				],
-				"security": [],
-				"parameters": []
+				"security": [
+					{
+						"jwt": [
+							"ADMIN"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/users/{id}": {
@@ -656,7 +980,11 @@
 				"tags": [
 					"Usuários"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -677,7 +1005,17 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/MessageResponse"
+									"$ref": "#/components/schemas/UserResponseDTO"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Erro de validação",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -691,22 +1029,16 @@
 								}
 							}
 						}
-					},
-					"500": {
-						"description": "Erro interno",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
 					}
 				},
 				"tags": [
 					"Usuários"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -728,6 +1060,52 @@
 						}
 					}
 				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Usuários"
+				],
+				"security": [
+					{
+						"jwt": [
+							"ADMIN"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/sales": {
@@ -990,7 +1368,63 @@
 				}
 			}
 		},
-		"/payments": {
+		"/sales/user/{userId}": {
+			"get": {
+				"operationId": "GetAllByUser",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaginatedResponse_SaleDetailResponse_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Vendas"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "userId",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/payment-methods": {
 			"post": {
 				"operationId": "Create",
 				"responses": {
@@ -999,24 +1433,14 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/PaymentResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Erro ao criar pagamento",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
+									"$ref": "#/components/schemas/PaymentMethodResponse"
 								}
 							}
 						}
 					}
 				},
 				"tags": [
-					"Pagamentos"
+					"Métodos de Pagamento"
 				],
 				"security": [
 					{
@@ -1029,14 +1453,133 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/PaymentRequest"
+								"$ref": "#/components/schemas/CreatePaymentMethodRequest"
 							}
 						}
 					}
 				}
 			},
 			"get": {
-				"operationId": "FindAll",
+				"operationId": "GetUserMethods",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/PaymentMethodResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Métodos de Pagamento"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/payment-methods/{id}": {
+			"get": {
+				"operationId": "GetById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaymentMethodResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Métodos de Pagamento"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Métodos de Pagamento"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/payments": {
+			"get": {
+				"operationId": "GetAll",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1079,11 +1622,55 @@
 						}
 					}
 				]
+			},
+			"post": {
+				"operationId": "Create",
+				"responses": {
+					"201": {
+						"description": "Pagamento criado com sucesso",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PaymentResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Erro de validação",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PaymentRequest"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/payments/{id}": {
 			"get": {
-				"operationId": "FindById",
+				"operationId": "GetById",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1096,11 +1683,55 @@
 						}
 					},
 					"404": {
-						"description": "Não encontrado",
+						"description": "Pagamento não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pagamentos"
+				],
+				"security": [
+					{
+						"jwt": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Pagamento não encontrado",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
 								}
 							}
 						}
@@ -1141,8 +1772,8 @@
 							}
 						}
 					},
-					"500": {
-						"description": "Erro interno",
+					"400": {
+						"description": "Erro de validação",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -1180,10 +1811,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/ItemResponse"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/PaginatedResponse_ItemResponse_"
 								}
 							}
 						}
@@ -1193,7 +1821,28 @@
 					"Itens"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		},
 		"/items/{id}": {
@@ -1249,16 +1898,6 @@
 								}
 							}
 						}
-					},
-					"404": {
-						"description": "Não encontrado",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/MessageResponse"
-								}
-							}
-						}
 					}
 				},
 				"tags": [
@@ -1285,7 +1924,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/ItemRequest"
+								"$ref": "#/components/schemas/Partial_ItemRequest_"
 							}
 						}
 					}
@@ -1296,16 +1935,6 @@
 				"responses": {
 					"200": {
 						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/MessageResponse"
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Erro ao deletar",
 						"content": {
 							"application/json": {
 								"schema": {
