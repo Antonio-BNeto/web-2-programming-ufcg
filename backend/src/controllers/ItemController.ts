@@ -34,10 +34,10 @@ export class ItemController extends Controller {
     @Request() request: AuthenticatedRequest
   ): Promise<ItemResponse> {
 
-    const item = await ItemService.createItem({
-      ...requestBody,
-      userId: request.user.id,
-    });
+    const item = await ItemService.createItem(
+      request.user.id,
+      requestBody,
+    );
     this.setStatus(201);
     return item.toJSON() as ItemResponse;
   }
@@ -51,13 +51,13 @@ export class ItemController extends Controller {
     const result = await ItemService.getAllItems(page, limit);
 
     return {
-    totalItems: result.total,
-    totalPages: result.totalPages,
-    currentPage: result.page,
-    items: result.items.map(item =>
-      item.toJSON()
-    ) as ItemResponse[]
-  };
+      totalItems: result.total,
+      totalPages: result.totalPages,
+      currentPage: result.page,
+      items: result.items.map(item =>
+        item.toJSON()
+      ) as ItemResponse[]
+    };
   }
 
   @Get("{id}")
@@ -72,24 +72,30 @@ export class ItemController extends Controller {
 
   @Put("{id}")
   @Security("jwt")
-  @Response<MessageResponse>(404, "Não encontrado")
   public async update(
     @Path() id: number,
-    @Body() requestBody: Partial<ItemRequest>
+    @Body() requestBody: Partial<ItemRequest>,
+    @Request() request: AuthenticatedRequest
   ): Promise<ItemResponse> {
 
-    const updated = await ItemService.updateItem(id, requestBody);
+    const updated = await ItemService.updateItem(
+      id,
+      request.user.id,
+      requestBody
+    );
+
     return updated.toJSON() as ItemResponse;
   }
 
   @Delete("{id}")
   @Security("jwt")
-  @Response<MessageResponse>(404, "Erro ao deletar")
   public async delete(
-    @Path() id: number
+    @Path() id: number,
+    @Request() request: AuthenticatedRequest
   ): Promise<MessageResponse> {
 
-    await ItemService.deleteItem(id);
+    await ItemService.deleteItem(id, request.user.id);
+
     return { message: "Item deletado com sucesso" };
   }
 }

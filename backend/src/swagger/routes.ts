@@ -162,6 +162,7 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "description": {"dataType":"string"},
+            "status": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["NEGOTIATING"]},{"dataType":"enum","enums":["CONFIRMED"]},{"dataType":"enum","enums":["PAID"]},{"dataType":"enum","enums":["CANCELLED"]}]},
         },
         "additionalProperties": false,
     },
@@ -333,6 +334,7 @@ export function RegisterRoutes(app: Router) {
                 limit: {"default":10,"in":"query","name":"limit","dataType":"double"},
         };
         app.get('/users',
+            authenticateMiddleware([{"jwt":["ADMIN"]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getAll)),
 
@@ -361,8 +363,10 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsUserController_getById: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.get('/users/:id',
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getById)),
 
@@ -392,8 +396,10 @@ export function RegisterRoutes(app: Router) {
         const argsUserController_update: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"UpdateUserDTO"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.put('/users/:id',
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.update)),
 
@@ -424,6 +430,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.delete('/users/:id',
+            authenticateMiddleware([{"jwt":["ADMIN"]}]),
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.delete)),
 
@@ -568,6 +575,40 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'getById',
+                controller,
+                response,
+                next,
+                validatedArgs,
+                successStatus: undefined,
+              });
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsSaleController_getAllByUser: Record<string, TsoaRoute.ParameterSchema> = {
+                userId: {"in":"path","name":"userId","required":true,"dataType":"double"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
+                page: {"default":1,"in":"query","name":"page","dataType":"double"},
+                limit: {"default":10,"in":"query","name":"limit","dataType":"double"},
+        };
+        app.get('/sales/user/:userId',
+            authenticateMiddleware([{"jwt":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SaleController)),
+            ...(fetchMiddlewares<RequestHandler>(SaleController.prototype.getAllByUser)),
+
+            async function SaleController_getAllByUser(request: ExRequest, response: ExResponse, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args: argsSaleController_getAllByUser, request, response });
+
+                const controller = new SaleController();
+
+              await templateService.apiHandler({
+                methodName: 'getAllByUser',
                 controller,
                 response,
                 next,
@@ -743,6 +784,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsItemController_create: Record<string, TsoaRoute.ParameterSchema> = {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"ItemRequest"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.post('/items',
             authenticateMiddleware([{"jwt":[]}]),
@@ -836,6 +878,7 @@ export function RegisterRoutes(app: Router) {
         const argsItemController_update: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"Partial_ItemRequest_"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.put('/items/:id',
             authenticateMiddleware([{"jwt":[]}]),
@@ -867,6 +910,7 @@ export function RegisterRoutes(app: Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsItemController_delete: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                request: {"in":"request","name":"request","required":true,"dataType":"object"},
         };
         app.delete('/items/:id',
             authenticateMiddleware([{"jwt":[]}]),
