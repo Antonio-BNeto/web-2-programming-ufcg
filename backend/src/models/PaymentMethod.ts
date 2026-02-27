@@ -1,5 +1,8 @@
-import { Model, DataTypes, Optional } from "sequelize";
+import { Model, DataTypes, Optional, NonAttribute } from "sequelize";
 import sequelize from "../config/database";
+import Pix from "./Pix";
+import Card from "./Card";
+import BankAccount from "./BankAccount";
 
 export interface PaymentMethodAttributes {
   id: number;
@@ -19,6 +22,13 @@ class PaymentMethod
   public userId!: number;
   public type!: "PIX" | "CARD" | "BANK_ACCOUNT";
   public main!: boolean;
+
+  /** @ignore */
+  public Pix?: NonAttribute<Pix>;
+  /** @ignore */
+  public Card?: NonAttribute<Card>;
+  /** @ignore */
+  public BankAccount?: NonAttribute<BankAccount>;
 }
 
 PaymentMethod.init(
@@ -28,17 +38,14 @@ PaymentMethod.init(
       autoIncrement: true,
       primaryKey: true,
     },
-
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-
     type: {
       type: DataTypes.ENUM("PIX", "CARD", "BANK_ACCOUNT"),
       allowNull: false,
     },
-
     main: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

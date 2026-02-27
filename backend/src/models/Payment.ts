@@ -1,28 +1,44 @@
-import { Model, DataTypes, Optional } from "sequelize";
+import {
+  Model,
+  DataTypes,
+  Optional,
+  NonAttribute,
+  ForeignKey
+} from "sequelize";
 import sequelize from "../config/database";
+import Sale from "./Sale";
+
+export type PaymentStatus = "PAID" | "PENDING" | "CANCELLED";
 
 export interface PaymentAttributes {
   id: number;
   saleId: number;
   paymentMethodId: number;
-  status: string;
-  paymentDate: Date | null;
+  status: PaymentStatus;
+  paymentDate: Date;
   value: number;
 }
 
 export interface PaymentCreationAttributes
-  extends Optional<PaymentAttributes, "id" | "paymentDate"> {}
+  extends Optional<PaymentAttributes, "id"> {}
 
 class Payment
   extends Model<PaymentAttributes, PaymentCreationAttributes>
   implements PaymentAttributes
 {
   public id!: number;
-  public saleId!: number;
+
+  public saleId!: ForeignKey<Sale["id"]>;
+
   public paymentMethodId!: number;
-  public status!: string;
-  public paymentDate!: Date | null;
+
+  public status!: PaymentStatus;
+
+  public paymentDate!: Date;
+
   public value!: number;
+
+  public sale?: NonAttribute<Sale>;
 }
 
 Payment.init(
@@ -46,18 +62,18 @@ Payment.init(
     },
 
     status: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("PAID", "PENDING", "CANCELLED"),
       allowNull: false,
     },
 
     paymentDate: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
       field: "data_pagamento",
     },
 
     value: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
   },
@@ -67,5 +83,10 @@ Payment.init(
     timestamps: false,
   }
 );
+
+Payment.belongsTo(Sale, {
+  foreignKey: "saleId",
+  as: "sale",
+});
 
 export default Payment;

@@ -10,29 +10,16 @@ import {
   SuccessResponse,
   Response,
   Tags,
-  Security
+  Security,
+  Query,
+  Request
 } from "tsoa";
 
-import ItemRepository from "../repository/ItemRepository";
+import ItemService from "../services/ItemService";
 import { ErrorResponse, MessageResponse } from "../types/responses";
-
-interface ItemRequest {
-  /** @example "Teclado Mecânico" */
-  name: string;
-
-  /** @example "Teclado RGB switch blue" */
-  description: string;
-
-  /** @example 250.50 */
-  price: number;
-
-  /** @example 10 */
-  quantity: number;
-}
-
-interface ItemResponse extends ItemRequest {
-  id: number;
-}
+import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
+import { ItemRequest, ItemResponse } from "../dto/item";
+import { AuthenticatedRequest } from "../types/auth";
 
 @Route("items")
 @Tags("Itens")
@@ -41,29 +28,36 @@ export class ItemController extends Controller {
   @Post()
   @Security("jwt")
   @SuccessResponse(201, "Criado com sucesso")
-  @Response<ErrorResponse>(500, "Erro interno")
+  @Response<ErrorResponse>(400, "Erro de validação")
   public async create(
-    @Body() requestBody: ItemRequest
+    @Body() requestBody: ItemRequest,
+    @Request() request: AuthenticatedRequest
   ): Promise<ItemResponse> {
 
-    try {
-      const item = await ItemRepository.create(requestBody);
-
-      this.setStatus(201);
-      return item as ItemResponse;
-
-    } catch (err: any) {
-      this.setStatus(500);
-      throw {
-        message: "Erro ao criar item",
-        error: err.message
-      };
-    }
+    const item = await ItemService.createItem(
+      request.user.id,
+      requestBody,
+    );
+    this.setStatus(201);
+    return item.toJSON() as ItemResponse;
   }
 
   @Get()
-  public async getAll(): Promise<ItemResponse[]> {
-    return await ItemRepository.findAll();
+  public async getAll(
+    @Query() page: number = 1,
+    @Query() limit: number = 10
+  ): Promise<PaginatedResponse<ItemResponse>> {
+
+    const result = await ItemService.getAllItems(page, limit);
+
+    return {
+      totalItems: result.total,
+      totalPages: result.totalPages,
+      currentPage: result.page,
+      items: result.items.map(item =>
+        item.toJSON()
+      ) as ItemResponse[]
+    };
   }
 
   @Get("{id}")
@@ -72,47 +66,35 @@ export class ItemController extends Controller {
     @Path() id: number
   ): Promise<ItemResponse> {
 
-    const item = await ItemRepository.findById(id);
-
-    if (!item) {
-      this.setStatus(404);
-      throw { message: "Item não encontrado" };
-    }
-
-    return item;
+    const item = await ItemService.getItemById(id);
+    return item.toJSON() as ItemResponse;
   }
 
   @Put("{id}")
   @Security("jwt")
-  @Response<MessageResponse>(404, "Não encontrado")
   public async update(
     @Path() id: number,
-    @Body() requestBody: ItemRequest
+    @Body() requestBody: Partial<ItemRequest>,
+    @Request() request: AuthenticatedRequest
   ): Promise<ItemResponse> {
 
-    const updated = await ItemRepository.update(id, requestBody);
+    const updated = await ItemService.updateItem(
+      id,
+      request.user.id,
+      requestBody
+    );
 
-    if (!updated) {
-      this.setStatus(404);
-      throw { message: "Item não encontrado" };
-    }
-
-    return updated;
+    return updated.toJSON() as ItemResponse;
   }
 
   @Delete("{id}")
   @Security("jwt")
-  @Response<MessageResponse>(404, "Erro ao deletar")
   public async delete(
-    @Path() id: number
+    @Path() id: number,
+    @Request() request: AuthenticatedRequest
   ): Promise<MessageResponse> {
 
-    const result = await ItemRepository.delete(id);
-
-    if (!result) {
-      this.setStatus(404);
-      throw { message: "Item não encontrado" };
-    }
+    await ItemService.deleteItem(id, request.user.id);
 
     return { message: "Item deletado com sucesso" };
   }

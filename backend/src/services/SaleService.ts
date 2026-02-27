@@ -8,94 +8,169 @@ import { paginate } from "../utils/pagination";
 
 class SaleService {
 
-    public async getSalesPaginated(userId: number, page: number, limit: number) {
-        return await paginate(Sale, page, limit, {
-            where: { userId },
-            include: [
-                { model: User, as: 'user', attributes: ['name', 'email'] },
-                {
-                    model: Item,
-                    as: 'items',
-                    through: { attributes: ['quantity', 'unitPrice'] }
-                }
-            ]
-        });
+  async getSalesPaginated(
+    userId: number,
+    page: number,
+    limit: number
+  ) {
+    return await paginate(Sale, page, limit, {
+      where: { userId },
+      include: this.defaultIncludes(),
+      order: [["id", "DESC"]],
+    });
+  }
+
+  async getAllSalesPaginatedAdmin(
+    page: number,
+    limit: number
+  ) {
+    return await paginate(Sale, page, limit, {
+      include: this.defaultIncludes(),
+      order: [["id", "DESC"]],
+    });
+  }
+
+  async getSaleById(
+    saleId: number,
+    userId: number,
+    isAdmin: boolean = false
+  ) {
+    const where = isAdmin
+      ? { id: saleId }
+      : { id: saleId, userId };
+
+    const sale = await Sale.findOne({
+      where,
+      include: this.defaultIncludes(),
+    });
+
+    if (!sale) {
+      throw new Error("Venda não encontrada ou acesso negado.");
     }
 
-    public async getAllSalesPaginatedAdmin(page: number, limit: number) {
-        return await paginate(Sale, page, limit, {
-            include: [
-                { model: User, as: 'user', attributes: ['name', 'email'] },
-                {
-                    model: Item,
-                    as: 'items',
-                    through: { attributes: ['quantity', 'unitPrice'] }
-                }
-            ]
-        });
-    }
+    return sale;
+  }
 
-    public async getSaleById(saleId: number, userId: number, isAdmin: boolean = false) {
-        const whereCondition = isAdmin ? { id: saleId } : { id: saleId, userId };
+  async createSale(
+    userId: number,
+    description: string,
+    itemsData: SaleItemRequest[]
+  ) {
+    const transaction = await sequelize.transaction();
 
-        const sale = await Sale.findOne({
-            where: whereCondition,
-            include: [
-                { model: User, as: 'user', attributes: ['name', 'email'] },
-                { model: Item, as: 'items', through: { attributes: ['quantity', 'unitPrice'] } }
-            ]
-        });
+    try {
+      if (!itemsData || itemsData.length === 0) {
+        throw new Error("A venda deve conter ao menos um item.");
+      }
 
-        if (!sale) throw new Error("Venda não encontrada.");
-        return sale;
-    }
+      let total = 0;
+      const itemsToProcess: {
+        item: Item;
+        quantity: number;
+        unitPrice: number;
+      }[] = [];
 
-    public async createSale(userId: number, description: string, itemsData: SaleItemRequest[]) {
-        const transaction = await sequelize.transaction();
-        try {
-            let calculatedTotal = 0;
-            const itemsToProcess = [];
+      for (const ref of itemsData) {
+        const item = await Item.findByPk(ref.itemId, { transaction });
 
-            for (const itemRef of itemsData) {
-                const item = await Item.findByPk(itemRef.itemId, { transaction });
-                if (!item) throw new Error(`Item ID ${itemRef.itemId} não encontrado.`);
-                if (item.quantity < itemRef.quantity) throw new Error(`Estoque insuficiente: ${item.name}`);
-
-                calculatedTotal += item.price * itemRef.quantity;
-                itemsToProcess.push({ model: item, quantity: itemRef.quantity, unitPrice: item.price });
-            }
-
-            const sale = await Sale.create({ valueTotal: calculatedTotal, description, userId }, { transaction });
-
-            for (const itemData of itemsToProcess) {
-                await SaleItem.create({
-                    saleId: sale.id,
-                    itemId: itemData.model.id,
-                    quantity: itemData.quantity,
-                    unitPrice: itemData.unitPrice
-                }, { transaction });
-
-                await itemData.model.update(
-                    { quantity: itemData.model.quantity - itemData.quantity },
-                    { transaction }
-                );
-            }
-
-            await transaction.commit();
-            return sale;
-        } catch (err) {
-            await transaction.rollback();
-            throw err;
+        if (!item) {
+          throw new Error(`Item ${ref.itemId} não encontrado.`);
         }
+
+        if (item.quantity < ref.quantity) {
+          throw new Error(`Estoque insuficiente: ${item.name}`);
+        }
+
+        const price = Number(item.price);
+        total += price * ref.quantity;
+
+        itemsToProcess.push({
+          item,
+          quantity: ref.quantity,
+          unitPrice: price,
+        });
+      }
+
+      const sale = await Sale.create(
+        {
+          userId,
+          description,
+          valueTotal: total,
+          status: "NEGOTIATING",
+        },
+        { transaction }
+      );
+
+      for (const data of itemsToProcess) {
+        await SaleItem.create(
+          {
+            saleId: sale.id,
+            itemId: data.item.id,
+            quantity: data.quantity,
+            unitPrice: data.unitPrice,
+          },
+          { transaction }
+        );
+
+        await data.item.update(
+          { quantity: data.item.quantity - data.quantity },
+          { transaction }
+        );
+      }
+
+      await transaction.commit();
+      return sale;
+
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
+  }
+
+  async updateSale(
+    saleId: number,
+    userId: number,
+    data: SaleUpdateRequest,
+    isAdmin: boolean = false
+  ) {
+    const where = isAdmin
+      ? { id: saleId }
+      : { id: saleId, userId };
+
+    const sale = await Sale.findOne({ where });
+
+    if (!sale) {
+      throw new Error("Venda não encontrada ou acesso negado.");
     }
 
-    public async updateSale(saleId: number, userId: number, data: SaleUpdateRequest, isAdmin: boolean = false) {
-        const whereCondition = isAdmin ? { id: saleId } : { id: saleId, userId };
-        const sale = await Sale.findOne({ where: whereCondition });
-
-        if (!sale) throw new Error("Venda não encontrada ou acesso negado.");
-        return await sale.update(data);
+    if (sale.status === "PAID" || sale.status === "CANCELLED") {
+      throw new Error("Venda finalizada não pode ser alterada.");
     }
+
+    const allowedUpdates: Partial<SaleUpdateRequest> = {
+      description: data.description,
+      status: data.status,
+    };
+
+    return await sale.update(allowedUpdates);
+  }
+
+  private defaultIncludes() {
+    return [
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "name", "email"],
+      },
+      {
+        model: Item,
+        as: "items",
+        through: {
+          attributes: ["quantity", "unitPrice"],
+        },
+      },
+    ];
+  }
 }
 
 export default new SaleService();

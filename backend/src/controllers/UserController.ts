@@ -1,14 +1,30 @@
-import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Response, Tags } from "tsoa";
-import { UserRepository } from '../repository/UserRepository';
-import { hashPassword } from '../utils/auth';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Route,
+  Body,
+  Path,
+  SuccessResponse,
+  Response,
+  Tags,
+  Query,
+  Security,
+  Request
+} from "tsoa";
+
 import { ErrorResponse, MessageResponse } from "../types/responses";
 import {
   CreateUserDTO,
   UpdateUserDTO,
   UserResponseDTO
 } from "../dto/user";
-const userRepository = new UserRepository();
 
+import UserService from "../services/UserService";
+import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
+import { AuthenticatedRequest } from "../types/auth";
 
 @Route("users")
 @Tags("Usuários")
@@ -16,78 +32,104 @@ export class UserController extends Controller {
 
   @Post()
   @SuccessResponse(201, "Criado com sucesso")
-  @Response<ErrorResponse>(500, "Erro interno")
+  @Response<ErrorResponse>(400, "Erro de validação")
   public async create(
     @Body() requestBody: CreateUserDTO
   ): Promise<UserResponseDTO> {
+
     try {
-      const { password, ...rest } = requestBody;
-      const hashedPassword = await hashPassword(password!);
-
-      const user = await userRepository.createUser({
-        ...rest,
-        password: hashedPassword,
-        role: 'USER'
-      });
-
+      const user = await UserService.createUser(requestBody);
       this.setStatus(201);
-      return user as unknown as UserResponseDTO;
+      return user.get({ plain: true }) as UserResponseDTO;
 
     } catch (error: any) {
-      this.setStatus(500);
-      throw {
-        message: "Erro ao criar usuário",
-        error: error.message
-      };
+      this.setStatus(400);
+      throw { message: error.message };
     }
   }
 
   @Get()
-  public async getAll(): Promise<UserResponseDTO[]> {
-    const users = await userRepository.getAllUsers();
-    return users as unknown as UserResponseDTO[];
+  @Security("jwt", ["ADMIN"])
+  public async getAll(
+    @Query() page: number = 1,
+    @Query() limit: number = 10
+  ): Promise<PaginatedResponse<UserResponseDTO>> {
+
+    return await UserService.getAllUsers(page, limit);
   }
 
   @Get("{id}")
+  @Security("jwt")
   @Response<MessageResponse>(404, "Não encontrado")
   public async getById(
-    @Path() id: number
+    @Path() id: number,
+    @Request() request: AuthenticatedRequest
   ): Promise<UserResponseDTO> {
 
-    const user = await userRepository.getUserById(id);
+    try {
+      if (
+        request.user.role !== "ADMIN" &&
+        request.user.id !== id
+      ) {
+        this.setStatus(403);
+        throw { message: "Acesso negado." };
+      }
 
-    if (!user) {
-      this.setStatus(404);
-      throw {
-        message: "Usuário não encontrado"
-      };
+      const user = await UserService.getUserById(id);
+      return user.get({ plain: true }) as UserResponseDTO;
+
+    } catch (error: any) {
+      this.setStatus(this.getStatus() || 404);
+      throw { message: error.message };
     }
-
-    return user as unknown as UserResponseDTO;
   }
 
   @Put("{id}")
+  @Security("jwt")
   @Response<MessageResponse>(404, "Não encontrado")
-  @Response<ErrorResponse>(500, "Erro interno")
+  @Response<ErrorResponse>(400, "Erro de validação")
   public async update(
     @Path() id: number,
-    @Body() requestBody: UpdateUserDTO
-  ): Promise<MessageResponse> {
-    try {
-      const updated = await userRepository.updateUser(id, requestBody);
+    @Body() requestBody: UpdateUserDTO,
+    @Request() request: AuthenticatedRequest
+  ): Promise<UserResponseDTO> {
 
-      if (!updated) {
-        this.setStatus(404);
-        throw { message: "Usuário não encontrado ou dados iguais" };
+    try {
+      if (
+        request.user.role !== "ADMIN" &&
+        request.user.id !== id
+      ) {
+        this.setStatus(403);
+        throw { message: "Acesso negado." };
       }
 
-      return { message: "Usuário atualizado com sucesso" };
+      const updated = await UserService.updateUser(
+        id,
+        requestBody,
+        request.user.role
+      );
+
+      return updated.get({ plain: true }) as UserResponseDTO;
+
     } catch (error: any) {
-      this.setStatus(500);
-      throw {
-        message: "Erro ao atualizar usuário",
-        error: error.message
-      };
+      this.setStatus(this.getStatus() || 400);
+      throw { message: error.message };
+    }
+  }
+
+  @Delete("{id}")
+  @Security("jwt", ["ADMIN"])
+  @Response<MessageResponse>(404, "Não encontrado")
+  public async delete(
+    @Path() id: number
+  ): Promise<MessageResponse> {
+
+    try {
+      return await UserService.deleteUser(id);
+
+    } catch (error: any) {
+      this.setStatus(400);
+      throw { message: error.message };
     }
   }
 }
