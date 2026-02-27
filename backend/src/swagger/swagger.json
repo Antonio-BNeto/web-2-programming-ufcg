@@ -1131,16 +1131,6 @@
 								}
 							}
 						}
-					},
-					"500": {
-						"description": "Erro interno",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
 					}
 				},
 				"tags": [
