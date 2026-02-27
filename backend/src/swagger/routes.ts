@@ -103,6 +103,7 @@ const models: TsoaRoute.Models = {
             "name": {"dataType":"string"},
             "email": {"dataType":"string"},
             "password": {"dataType":"string"},
+            "role": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["USER"]},{"dataType":"enum","enums":["ADMIN"]}]},
         },
         "additionalProperties": false,
     },

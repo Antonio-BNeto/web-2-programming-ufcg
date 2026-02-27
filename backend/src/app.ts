@@ -12,4 +12,9 @@ app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 RegisterRoutes(app);
 
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const status = err.statusCode || err.status || 500;
+  return res.status(status).json({ message: err.message || 'Erro interno do servidor' });
+});
+
 export default app;

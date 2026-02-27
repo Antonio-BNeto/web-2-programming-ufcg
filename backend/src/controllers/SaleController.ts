@@ -2,36 +2,22 @@ import { Controller, Get, Post, Put, Route, Body, Path, SuccessResponse, Respons
 import { ErrorResponse, MessageResponse } from "../types/responses";
 import { AuthenticatedRequest } from "../types/auth";
 import SaleService from "../services/SaleService";
-import {
-  SaleCreateRequest,
-  SaleResponse,
-  SaleUpdateRequest,
-  SaleDetailResponse
-} from "../dto/sale";
+import { SaleCreateRequest, SaleResponse, SaleUpdateRequest, SaleDetailResponse } from "../dto/sale";
 import { PaginatedResponse } from "../dto/shared/PaginatedResponse.dto";
+import { AppError } from "../errors/AppError";
 
 @Route("sales")
 @Tags("Vendas")
 export class SaleController extends Controller {
-
   @Post()
   @Security("jwt")
   @SuccessResponse(201, "Venda criada com sucesso")
   @Response<ErrorResponse>(400, "Erro de negócio")
-  @Response<ErrorResponse>(500, "Erro interno")
   public async create(
     @Body() requestBody: SaleCreateRequest,
     @Request() request: AuthenticatedRequest
   ): Promise<SaleResponse> {
-
-    const userId = request.user.id;
-
-    const sale = await SaleService.createSale(
-      userId,
-      requestBody.description,
-      requestBody.items
-    );
-
+    const sale = await SaleService.createSale(request.user.id, requestBody.description, requestBody.items);
     this.setStatus(201);
     return sale;
   }
@@ -43,12 +29,7 @@ export class SaleController extends Controller {
     @Query() page: number = 1,
     @Query() limit: number = 10
   ): Promise<PaginatedResponse<SaleDetailResponse>> {
-
-    return await SaleService.getSalesPaginated(
-      request.user.id,
-      page,
-      limit
-    );
+    return await SaleService.getSalesPaginated(request.user.id, page, limit);
   }
 
   @Get("admin/all")
@@ -57,7 +38,6 @@ export class SaleController extends Controller {
     @Query() page: number = 1,
     @Query() limit: number = 10
   ): Promise<PaginatedResponse<SaleDetailResponse>> {
-
     return await SaleService.getAllSalesPaginatedAdmin(page, limit);
   }
 
@@ -68,7 +48,6 @@ export class SaleController extends Controller {
     @Path() id: number,
     @Request() request: AuthenticatedRequest
   ): Promise<SaleDetailResponse> {
-
     return await SaleService.getSaleById(id, request.user.id);
   }
 
@@ -80,20 +59,10 @@ export class SaleController extends Controller {
     @Query() page: number = 1,
     @Query() limit: number = 10
   ): Promise<PaginatedResponse<SaleDetailResponse>> {
-
-    if (
-      request.user.role !== "ADMIN" &&
-      request.user.id !== userId
-    ) {
-      this.setStatus(403);
-      throw { message: "Acesso negado." };
+    if (request.user.role !== "ADMIN" && request.user.id !== userId) {
+      throw new AppError("Acesso negado.", 403);
     }
-
-    return await SaleService.getSalesPaginated(
-      userId,
-      page,
-      limit
-    );
+    return await SaleService.getSalesPaginated(userId, page, limit);
   }
 
   @Put("{id}")
@@ -105,11 +74,6 @@ export class SaleController extends Controller {
     @Body() requestBody: SaleUpdateRequest,
     @Request() request: AuthenticatedRequest
   ): Promise<SaleResponse> {
-
-    return await SaleService.updateSale(
-      id,
-      request.user.id,
-      requestBody
-    );
+    return await SaleService.updateSale(id, request.user.id, requestBody);
   }
 }
