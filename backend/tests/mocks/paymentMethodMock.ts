@@ -9,7 +9,7 @@ export const mockPixMethodResponse = {
   Pix: {
     id: 1,
     payment_method_id: 1,
-    key: "neto@ufcg.edu.br"
+    key: "neto@gmail.com"
   }
 };
 
@@ -31,18 +31,17 @@ export const mockCardMethodResponse = {
 };
 
 // Mock para resposta de Conta Bancária
+// tests/mocks/paymentMethodMock.ts
 export const mockBankMethodResponse = {
-  id: 3,
+  id: 2,
   userId: 1,
-  type: "BANK_ACCOUNT" as const,
+  type: "BANK_ACCOUNT",
   main: false,
   BankAccount: {
-    id: 1,
-    payment_method_id: 3,
     bank_name: "Banco do Brasil",
-    agency: "1234-5",
-    account_number: "00012345-6",
-    account_type: "CORRENTE"
+    agency: "0001",
+    account_number: "123456-7",
+    account_type: "corrente"
   }
 };
 

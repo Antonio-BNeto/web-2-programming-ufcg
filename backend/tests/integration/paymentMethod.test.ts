@@ -2,7 +2,7 @@ import request from 'supertest';
 import app from '@/app';
 import PaymentMethodService from '@/services/PaymentMethodService';
 import { generateTestToken } from '../helpers/auth';
-import { mockPixMethodResponse, mockBankMethodResponse } from '../mocks'; // Import simples
+import { mockPixMethodResponse, mockBankMethodResponse } from '../mocks';
 
 describe('PaymentMethod Integration', () => {
   const token = generateTestToken(1);
@@ -17,7 +17,7 @@ describe('PaymentMethod Integration', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(200);
-    expect(response.body[0].Pix.key).toBe("neto@ufcg.edu.br");
+    expect(response.body[0].Pix.key).toBe("neto@gmail.com");
   });
 
   it('deve validar criação de conta bancária', async () => {
@@ -28,7 +28,15 @@ describe('PaymentMethod Integration', () => {
     const response = await request(app)
       .post('/payment-methods')
       .set('Authorization', `Bearer ${token}`)
-      .send({ type: "BANK_ACCOUNT", data: { bank_name: "BB" } });
+      .send({
+        type: "BANK_ACCOUNT",
+        bankAccount: {
+          bank_name: "Banco do Brasil",
+          agency: "0001",
+          account_number: "123456-7",
+          account_type: "corrente"
+        }
+      });
 
     expect(response.status).toBe(201);
     expect(response.body.BankAccount.bank_name).toBe("Banco do Brasil");
