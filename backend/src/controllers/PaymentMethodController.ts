@@ -4,11 +4,11 @@ import { AuthenticatedRequest } from "../types/auth";
 import { MessageResponse, ErrorResponse } from "../types/responses";
 import { CreatePaymentMethodRequest } from "../dto/paymentMethod/PaymentMethodRequest.dto";
 import { PaymentMethodResponse } from "../dto/paymentMethod/PaymentMethodResponse.dto";
+import { AppError } from "../errors/AppError";
 
 @Route("payment-methods")
 @Tags("Métodos de Pagamento")
 export class PaymentMethodController extends Controller {
-
   @Post()
   @Security("jwt")
   @SuccessResponse(201, "Criado com sucesso")
@@ -38,8 +38,7 @@ export class PaymentMethodController extends Controller {
   ): Promise<PaymentMethodResponse> {
     const method = await PaymentMethodService.getPaymentMethodById(id);
     if (method.userId !== request.user.id) {
-      this.setStatus(403);
-      throw new Error("Acesso negado");
+      throw new AppError("Acesso negado.", 403);
     }
     return method;
   }

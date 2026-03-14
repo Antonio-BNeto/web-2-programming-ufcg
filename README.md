@@ -240,6 +240,44 @@ docker compose down -v
 docker compose up --build -d
 ```
 
+
+------------------------------------------------------------------------
+
+# 🧪 Como Executar os Testes
+
+Os testes são de integração e rodam **localmente**, sem necessidade do Docker.
+Eles utilizam mocks dos services, portanto **não é necessário ter o banco de dados rodando**.
+
+---
+
+## ✅ 1. Instalar dependências
+
+Caso ainda não tenha instalado:
+```bash
+npm install
+```
+
+---
+
+## ✅ 2. Rodar todos os testes
+```bash
+npm run test
+```
+
+---
+
+## ✅ 3. Rodar um arquivo de teste específico
+```bash
+npx jest tests/integration/item.test.ts
+```
+
+---
+
+## ✅ 4. Rodar com cobertura de código
+```bash
+npx jest --coverage
+```
+
 ------------------------------------------------------------------------
 
 # 👨‍💻 Autores
