@@ -90,13 +90,21 @@ class PaymentMethodService {
   async getUserPaymentMethods(userId: number) {
     return await PaymentMethod.findAll({
       where: { userId },
-      include: [Pix, BankAccount, Card],
+      include: [
+        { model: Pix, as: 'Pix' },
+        { model: Card, as: 'Card' },
+        { model: BankAccount, as: 'BankAccount' },
+      ],
     });
   }
 
   async getPaymentMethodById(paymentMethodId: number) {
     const paymentMethod = await PaymentMethod.findByPk(paymentMethodId, {
-      include: [Pix, BankAccount, Card],
+      include: [
+        { model: Pix, as: 'Pix' },
+        { model: Card, as: 'Card' },
+        { model: BankAccount, as: 'BankAccount' },
+      ],
     });
     if (!paymentMethod) throw new AppError("Método de pagamento não encontrado.", 404);
     return paymentMethod;

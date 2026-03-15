@@ -4,6 +4,9 @@ import Item from "./Item";
 import Payment from "./Payment";
 import SaleItem from "./SaleItem";
 import PaymentMethod from "./PaymentMethod";
+import Pix from "./Pix";
+import Card from "./Card";
+import BankAccount from "./BankAccount";
 
 export const setupAssociations = () => {
 
@@ -94,6 +97,36 @@ export const setupAssociations = () => {
 
   Payment.belongsTo(PaymentMethod, {
     foreignKey: "paymentMethodId",
+    as: "paymentMethod",
+  });
+
+  PaymentMethod.hasOne(Pix, {
+    foreignKey: "payment_method_id",
+    as: "Pix",
+  });
+
+  Pix.belongsTo(PaymentMethod, {
+    foreignKey: "payment_method_id",
+    as: "paymentMethod",
+  });
+
+  PaymentMethod.hasOne(Card, {
+    foreignKey: "payment_method_id",
+    as: "Card",
+  });
+
+  Card.belongsTo(PaymentMethod, {
+    foreignKey: "payment_method_id",
+    as: "paymentMethod",
+  });
+
+  PaymentMethod.hasOne(BankAccount, {
+    foreignKey: "payment_method_id",
+    as: "BankAccount",
+  });
+
+  BankAccount.belongsTo(PaymentMethod, {
+    foreignKey: "payment_method_id",
     as: "paymentMethod",
   });
 

@@ -11,6 +11,7 @@ import {
 import { comparePassword, generateToken } from "../utils/auth";
 import User from "../models/User";
 import { ErrorResponse } from "../types/responses";
+import { AppError } from "../errors/AppError";
 
 interface LoginRequest {
   /** @example "usuario@email.com" */
@@ -42,41 +43,23 @@ export class AuthController extends Controller {
 
     const { email, password } = body;
 
-    try {
-      const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email } });
 
-      if (!user) {
-        this.setStatus(400);
-        throw { message: "Invalid email or password" };
-      }
-
-      const isPasswordValid = await comparePassword(
-        password,
-        user.password
-      );
-
-      if (!isPasswordValid) {
-        this.setStatus(400);
-        throw { message: "Invalid email or password" };
-      }
-
-      const token = generateToken(user.id, user.email);
-
-      return {
-        message: "Login successful",
-        token
-      };
-
-    } catch (err: any) {
-
-      if (!this.getStatus()) {
-        this.setStatus(500);
-      }
-
-      throw {
-        message: "Error logging in",
-        error: err?.message ?? err
-      };
+    if (!user) {
+      throw new AppError("E-mail ou senha inválidos.", 400);
     }
+
+    const isPasswordValid = await comparePassword(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new AppError("E-mail ou senha inválidos.", 400);
+    }
+
+    const token = generateToken(user.id, user.email);
+
+    return {
+      message: "Login successful",
+      token
+    };
   }
 }
