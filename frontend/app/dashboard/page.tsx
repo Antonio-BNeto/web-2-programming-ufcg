@@ -15,7 +15,7 @@ interface StatCard { label: string; value: string | number; Icon: LucideIcon; hr
 
 const quickActions: { href: string; Icon: LucideIcon; label: string; description: string }[] = [
   { href: '/my-items',        Icon: Package,      label: 'Meus Anúncios',      description: 'Gerencie seus itens à venda' },
-  { href: '/sales',           Icon: ShoppingCart, label: 'Minhas Vendas',      description: 'Acompanhe suas transações' },
+  { href: '/sales',           Icon: ShoppingCart, label: 'Minhas Compras',     description: 'Acompanhe seus pedidos' },
   { href: '/payments',        Icon: CreditCard,   label: 'Pagamentos',         description: 'Registre e veja pagamentos' },
   { href: '/payment-methods', Icon: Landmark,     label: 'Formas de Pagamento',description: 'PIX, cartão e conta bancária' },
   { href: '/profile',         Icon: User,         label: 'Meu Perfil',         description: 'Atualize seus dados pessoais' },
@@ -36,7 +36,7 @@ export default function DashboardPage() {
       ]);
       setStats([
         { label: 'Meus anúncios',       value: itemsRes.status     === 'fulfilled' ? itemsRes.value.totalItems     : '-', Icon: Package,      href: '/my-items' },
-        { label: 'Vendas',              value: salesRes.status     === 'fulfilled' ? salesRes.value.totalItems     : '-', Icon: ShoppingCart, href: '/sales' },
+        { label: 'Compras',             value: salesRes.status     === 'fulfilled' ? salesRes.value.totalItems     : '-', Icon: ShoppingCart, href: '/sales' },
         { label: 'Pagamentos',          value: paymentsRes.status  === 'fulfilled' ? paymentsRes.value.totalItems  : '-', Icon: CreditCard,   href: '/payments' },
         { label: 'Métodos de pagamento',value: methodsRes.status   === 'fulfilled' ? methodsRes.value.length       : '-', Icon: Landmark,     href: '/payment-methods' },
       ]);

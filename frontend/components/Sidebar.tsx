@@ -13,7 +13,7 @@ const navItems: { href: string; label: string; Icon: LucideIcon }[] = [
   { href: '/marketplace',      label: 'Explorar',           Icon: Store          },
   { href: '/dashboard',        label: 'Meu Painel',         Icon: LayoutDashboard},
   { href: '/my-items',         label: 'Meus Anúncios',      Icon: Package        },
-  { href: '/sales',            label: 'Vendas',             Icon: ShoppingCart   },
+  { href: '/sales',            label: 'Minhas Compras',     Icon: ShoppingCart   },
   { href: '/payments',         label: 'Pagamentos',         Icon: CreditCard     },
   { href: '/payment-methods',  label: 'Métodos de Pagamento', Icon: Landmark     },
   { href: '/profile',          label: 'Meu Perfil',         Icon: User           },

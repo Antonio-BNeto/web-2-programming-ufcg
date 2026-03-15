@@ -82,7 +82,7 @@ export default function Navbar() {
           {user && (
             <>
               <NavLink href="/my-items" label="Meus Itens" active={pathname === '/my-items'} />
-              <NavLink href="/sales" label="Vendas" active={pathname.startsWith('/sales')} />
+              <NavLink href="/sales" label="Compras" active={pathname.startsWith('/sales')} />
             </>
           )}
         </div>
@@ -108,7 +108,7 @@ export default function Navbar() {
                   {isAdmin && <DropItem href="/admin/dashboard" icon={<Shield className="w-4 h-4" />} label="Painel Admin" onClick={() => setMenuOpen(false)} />}
                   <DropItem href="/dashboard"        icon={<LayoutDashboard className="w-4 h-4" />} label="Minha Conta"        onClick={() => setMenuOpen(false)} />
                   <DropItem href="/my-items"         icon={<Package className="w-4 h-4" />}         label="Meus Anúncios"      onClick={() => setMenuOpen(false)} />
-                  <DropItem href="/sales"            icon={<ShoppingCart className="w-4 h-4" />}    label="Minhas Vendas"      onClick={() => setMenuOpen(false)} />
+                  <DropItem href="/sales"            icon={<ShoppingCart className="w-4 h-4" />}    label="Minhas Compras"     onClick={() => setMenuOpen(false)} />
                   <DropItem href="/payments"         icon={<CreditCard className="w-4 h-4" />}      label="Pagamentos"         onClick={() => setMenuOpen(false)} />
                   <DropItem href="/payment-methods"  icon={<Landmark className="w-4 h-4" />}        label="Formas de Pagamento" onClick={() => setMenuOpen(false)} />
                   <DropItem href="/profile"          icon={<User className="w-4 h-4" />}            label="Meu Perfil"         onClick={() => setMenuOpen(false)} />
