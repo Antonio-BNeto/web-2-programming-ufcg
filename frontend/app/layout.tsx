@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Brasa - Admin",
-  description: "Sistema de gerenciamento interno Brasa",
+  title: "Brasa Marketplace",
+  description: "Compre e venda itens com pessoas ao seu redor.",
 };
 
 export default function RootLayout({

@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #fdfdfd;
   --foreground: #111827;
+
+  --color-brasa-red: #da362d;
+  --color-brasa-orange: #f48020;
+  --color-brasa-yellow: #fcd53f;
+
+  --color-brasa-dark: #0f1115;
+  --color-brasa-cream: #fff3db;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 @theme inline {
+  --color-primary: var(--color-brasa-red);
+  --color-secondary: var(--color-brasa-orange);
+  --color-accent: var(--color-brasa-yellow);
+
+  --color-brasa-red: #da362d;
+  --color-brasa-orange: #f48020;
+  --color-brasa-yellow: #fcd53f;
+  --color-brasa-dark: #0f1115;
+  --color-brasa-cream: #fff3db;
+
+  --color-brand-dark: var(--color-brasa-dark);
+  --color-brand-cream: var(--color-brasa-cream);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --foreground: #f8fafc;
-  }
-}
-
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.text-gradient-brasa {
+  background: linear-gradient(135deg, var(--color-brasa-red) 30%, var(--color-brasa-orange) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.btn-brasa {
+  @apply bg-brasa-orange text-white px-6 py-2 rounded-md font-bold transition duration-200 
+         hover:bg-brasa-red active:scale-95 shadow-md;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
