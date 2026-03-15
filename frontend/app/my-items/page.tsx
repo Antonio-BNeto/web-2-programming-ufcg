@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { Package, Inbox, Trash2 } from 'lucide-react';
 import ShopLayout from '@/components/ShopLayout';
 import Modal from '@/components/Modal';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -102,7 +103,6 @@ export default function MyItemsPage() {
   return (
     <ShopLayout wide>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Meus Anúncios</h1>
@@ -128,7 +128,9 @@ export default function MyItemsPage() {
           <LoadingSpinner />
         ) : myItems.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-xl border border-gray-100 shadow-sm">
-            <p className="text-5xl mb-4">📭</p>
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Inbox className="w-8 h-8 text-gray-400" />
+            </div>
             <h2 className="text-lg font-semibold text-gray-700">Você ainda não tem anúncios</h2>
             <p className="text-sm text-gray-400 mt-1 mb-6">Publique seu primeiro item e comece a vender!</p>
             <button
@@ -156,7 +158,6 @@ export default function MyItemsPage() {
         )}
       </div>
 
-      {/* ── Create Modal ──────────────────────────────────── */}
       <Modal
         open={createOpen}
         title="Novo anúncio"
@@ -213,7 +214,6 @@ export default function MyItemsPage() {
         </div>
       </Modal>
 
-      {/* ── Edit Modal ────────────────────────────────────── */}
       <Modal
         open={!!editItem}
         title={`Editar — ${editItem?.name}`}
@@ -268,7 +268,6 @@ export default function MyItemsPage() {
         </div>
       </Modal>
 
-      {/* ── Delete Modal ──────────────────────────────────── */}
       <Modal
         open={!!deleteItem}
         title="Excluir anúncio"
@@ -287,8 +286,6 @@ export default function MyItemsPage() {
   );
 }
 
-// ── Sub-components ──────────────────────────────────────────────
-
 function ItemCard({
   item, onEdit, onDelete,
 }: { item: Item; onEdit: () => void; onDelete: () => void }) {
@@ -296,9 +293,8 @@ function ItemCard({
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-      {/* Thumbnail */}
       <div className="h-36 bg-linear-to-br from-orange-50 to-red-50 flex items-center justify-center relative">
-        <span className="text-5xl select-none">📦</span>
+        <Package className="w-14 h-14 text-orange-200" />
         {outOfStock && (
           <span className="absolute top-2 right-2 bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full">
             Sem estoque
@@ -306,7 +302,6 @@ function ItemCard({
         )}
       </div>
 
-      {/* Body */}
       <div className="flex-1 p-4 space-y-1">
         <h3 className="font-semibold text-gray-900 truncate text-sm">{item.name}</h3>
         <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{item.description}</p>
@@ -318,7 +313,6 @@ function ItemCard({
         </div>
       </div>
 
-      {/* Actions */}
       <div className="px-4 pb-4 flex gap-2">
         <Link
           href={`/marketplace/${item.id}`}
@@ -335,9 +329,9 @@ function ItemCard({
         </button>
         <button
           onClick={onDelete}
-          className="px-3 py-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition text-xs"
+          className="px-3 py-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition"
         >
-          🗑
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
     </div>

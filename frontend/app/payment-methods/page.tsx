@@ -1,30 +1,29 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { Zap, CreditCard, Landmark, Trash2, type LucideIcon } from 'lucide-react';
 import ShopLayout from '@/components/ShopLayout';
 import Modal from '@/components/Modal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { paymentMethodService } from '@/services/paymentMethodService';
 import { PaymentMethod, PaymentMethodType, CreatePaymentMethodRequest } from '@/types';
 
-const TYPE_OPTIONS: { value: PaymentMethodType; label: string; icon: string }[] = [
-  { value: 'PIX', label: 'PIX', icon: '⚡' },
-  { value: 'CARD', label: 'Cartão', icon: '💳' },
-  { value: 'BANK_ACCOUNT', label: 'Conta Bancária', icon: '🏦' },
+interface TypeOption {
+  value: PaymentMethodType;
+  label: string;
+  Icon: LucideIcon;
+  color: string;
+  iconCls: string;
+}
+
+const TYPE_OPTIONS: TypeOption[] = [
+  { value: 'PIX',          label: 'PIX',           Icon: Zap,        color: 'bg-green-50 text-green-600 border-green-100', iconCls: 'text-green-500' },
+  { value: 'CARD',         label: 'Cartão',         Icon: CreditCard, color: 'bg-blue-50 text-blue-600 border-blue-100',   iconCls: 'text-blue-500'  },
+  { value: 'BANK_ACCOUNT', label: 'Conta Bancária', Icon: Landmark,   color: 'bg-yellow-50 text-yellow-700 border-yellow-100', iconCls: 'text-yellow-600' },
 ];
 
-function typeIcon(type: PaymentMethodType) {
-  return TYPE_OPTIONS.find((t) => t.value === type)?.icon ?? '💰';
-}
-
-function typeLabel(type: PaymentMethodType) {
-  return TYPE_OPTIONS.find((t) => t.value === type)?.label ?? type;
-}
-
-function typeColor(type: PaymentMethodType) {
-  if (type === 'PIX') return 'bg-green-50 text-green-600 border-green-100';
-  if (type === 'CARD') return 'bg-blue-50 text-blue-600 border-blue-100';
-  return 'bg-yellow-50 text-yellow-700 border-yellow-100';
+function getTypeOption(type: PaymentMethodType) {
+  return TYPE_OPTIONS.find((t) => t.value === type) ?? TYPE_OPTIONS[0];
 }
 
 function detailLines(pm: PaymentMethod): string[] {
@@ -112,7 +111,7 @@ export default function PaymentMethodsPage() {
 
   return (
     <ShopLayout>
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <div className="max-w-3xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Formas de Pagamento</h1>
@@ -132,7 +131,9 @@ export default function PaymentMethodsPage() {
           <LoadingSpinner />
         ) : methods.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
-            <p className="text-4xl mb-3">🏦</p>
+            <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Landmark className="w-7 h-7 text-gray-400" />
+            </div>
             <p className="font-semibold text-gray-700">Nenhum método cadastrado</p>
             <p className="text-sm text-gray-400 mt-1">Adicione PIX, cartão ou conta bancária.</p>
           </div>
@@ -162,7 +163,7 @@ export default function PaymentMethodsPage() {
                       : 'border-gray-200 text-gray-600 hover:border-orange-300'
                   }`}
                 >
-                  <span>{t.icon}</span>
+                  <t.Icon className="w-4 h-4" />
                   <span>{t.label}</span>
                 </button>
               ))}
@@ -239,7 +240,7 @@ export default function PaymentMethodsPage() {
       {/* Delete Modal */}
       <Modal open={!!deleteMethod} title="Remover forma de pagamento" onClose={() => setDeleteMethod(null)} onConfirm={handleDelete} confirmLabel="Remover" confirmVariant="danger" loading={deleteLoading}>
         <p className="text-sm text-gray-700">
-          Deseja remover o método <strong>{deleteMethod ? typeLabel(deleteMethod.type) : ''}</strong>? Esta ação não pode ser desfeita.
+          Deseja remover o método <strong>{deleteMethod ? getTypeOption(deleteMethod.type).label : ''}</strong>? Esta ação não pode ser desfeita.
         </p>
       </Modal>
     </ShopLayout>
@@ -247,16 +248,18 @@ export default function PaymentMethodsPage() {
 }
 
 function MethodCard({ pm, onDelete }: { pm: PaymentMethod; onDelete: () => void }) {
+  const opt = getTypeOption(pm.type);
   const lines = detailLines(pm);
+
   return (
-    <div className={`bg-white border rounded-2xl p-5 shadow-sm relative overflow-hidden ${typeColor(pm.type)}`}>
+    <div className={`bg-white border rounded-2xl p-5 shadow-sm ${opt.color}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-white/70 flex items-center justify-center text-2xl shadow-sm">
-            {typeIcon(pm.type)}
+          <div className="w-11 h-11 rounded-xl bg-white/70 flex items-center justify-center shadow-sm">
+            <opt.Icon className={`w-5 h-5 ${opt.iconCls}`} />
           </div>
           <div>
-            <p className="font-semibold text-sm">{typeLabel(pm.type)}</p>
+            <p className="font-semibold text-sm">{opt.label}</p>
             {pm.main && (
               <span className="text-xs bg-white/60 px-2 py-0.5 rounded-full font-medium">Principal</span>
             )}
@@ -264,12 +267,10 @@ function MethodCard({ pm, onDelete }: { pm: PaymentMethod; onDelete: () => void 
         </div>
         <button
           onClick={onDelete}
-          className="p-1.5 rounded-lg hover:bg-black/10 transition text-current opacity-60 hover:opacity-100"
+          className="p-1.5 rounded-lg hover:bg-black/10 transition opacity-60 hover:opacity-100"
           title="Remover"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
       <div className="mt-4 space-y-0.5">

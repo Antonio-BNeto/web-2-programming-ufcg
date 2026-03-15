@@ -27,7 +27,7 @@ export default function LoginPage() {
       setToken(res.token);
       const payload = parseJwt(res.token);
       if (payload) setStoredUser(payload);
-      router.push('/marketplace');
+      router.push(payload?.role === 'ADMIN' ? '/admin/dashboard' : '/marketplace');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erro ao fazer login');
     } finally {
@@ -36,9 +36,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f1115]">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0f1115]">
       <div className="w-full max-w-sm">
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <BrasaLogo size={48} textSize="text-4xl" subtitle="Marketplace" />
         </div>

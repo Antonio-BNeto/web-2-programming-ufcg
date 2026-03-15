@@ -8,8 +8,6 @@ import { getToken } from '@/utils/auth';
 import { CreateUserRequest } from '@/types';
 import BrasaLogo from '@/components/BrasaLogo';
 
-// ── Validation ─────────────────────────────────────────────────
-
 function validateCpf(cpf: string) {
   const digits = cpf.replace(/\D/g, '');
   return digits.length === 11;
@@ -28,8 +26,6 @@ function validateEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// ── CPF / Phone masking ────────────────────────────────────────
-
 function maskCpf(value: string) {
   const d = value.replace(/\D/g, '').slice(0, 11);
   return d
@@ -43,8 +39,6 @@ function maskPhone(value: string) {
   if (d.length <= 10) return d.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
   return d.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
 }
-
-// ── Form state type ────────────────────────────────────────────
 
 interface FormState {
   name: string;
@@ -73,8 +67,6 @@ const EMPTY_FORM: FormState = {
   confirmPassword: '',
 };
 
-// ── Component ──────────────────────────────────────────────────
-
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -84,10 +76,8 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (getToken()) router.push('/dashboard');
+    if (getToken()) router.push('/marketplace');
   }, [router]);
-
-  // ── Field-level validation ───────────────────────────────────
 
   function validateField(name: keyof FormState, value: string): string {
     switch (name) {
@@ -120,7 +110,6 @@ export default function RegisterPage() {
     const error = validateField(name, value);
     setErrors((e) => ({ ...e, [name]: error }));
 
-    // Re-validate confirmPassword when password changes
     if (name === 'password') {
       const confirmError = form.confirmPassword
         ? form.confirmPassword !== value
@@ -140,8 +129,6 @@ export default function RegisterPage() {
     setErrors(next);
     return Object.keys(next).length === 0;
   }
-
-  // ── Submit ───────────────────────────────────────────────────
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -168,8 +155,6 @@ export default function RegisterPage() {
     }
   }
 
-  // ── Success screen ───────────────────────────────────────────
-
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0f1115]">
@@ -194,12 +179,9 @@ export default function RegisterPage() {
     );
   }
 
-  // ── Registration form ────────────────────────────────────────
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f1115] py-10">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0f1115] py-10">
       <div className="w-full max-w-md px-4">
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <BrasaLogo size={48} textSize="text-4xl" subtitle="Marketplace" />
         </div>
@@ -217,7 +199,6 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* Name */}
           <Field
             label="Nome completo"
             error={errors.name}
@@ -231,7 +212,6 @@ export default function RegisterPage() {
             />
           </Field>
 
-          {/* Email */}
           <Field label="E-mail" error={errors.email}>
             <input
               type="email"
@@ -242,7 +222,6 @@ export default function RegisterPage() {
             />
           </Field>
 
-          {/* CPF + Phone side by side */}
           <div className="grid grid-cols-2 gap-3">
             <Field label="CPF" error={errors.cpf}>
               <input
@@ -266,7 +245,6 @@ export default function RegisterPage() {
             </Field>
           </div>
 
-          {/* Password */}
           <Field label="Senha" error={errors.password} hint="Mín. 8 caracteres, 1 maiúscula, 1 número">
             <input
               type="password"
@@ -277,7 +255,6 @@ export default function RegisterPage() {
             />
           </Field>
 
-          {/* Confirm Password */}
           <Field label="Confirmar senha" error={errors.confirmPassword}>
             <input
               type="password"
@@ -307,8 +284,6 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-// ── Sub-components ─────────────────────────────────────────────
 
 function Field({
   label,

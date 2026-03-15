@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
+import { Search, Package, X } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Pagination from '@/components/Pagination';
@@ -46,7 +47,6 @@ function MarketplaceContent() {
   }, []);
 
   useEffect(() => { load(page); }, [page, load]);
-  // Reset to page 1 when search changes
   useEffect(() => { setPage(1); }, [queryParam]);
 
   function changePage(p: number) {
@@ -55,10 +55,9 @@ function MarketplaceContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
 
-      {/* Category bar */}
       <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-6 overflow-x-auto">
           <button
@@ -70,8 +69,7 @@ function MarketplaceContent() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1">
         <div className="mb-6">
           {queryParam ? (
             <div className="flex items-center gap-3">
@@ -80,9 +78,9 @@ function MarketplaceContent() {
               </h1>
               <button
                 onClick={() => router.push('/marketplace')}
-                className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full px-3 py-1 transition"
+                className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-full px-3 py-1 transition"
               >
-                ✕ Limpar busca
+                <X className="w-3 h-3" /> Limpar busca
               </button>
             </div>
           ) : (
@@ -117,7 +115,9 @@ function MarketplaceContent() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-24">
-            <p className="text-5xl mb-4">🔍</p>
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-7 h-7 text-gray-400" />
+            </div>
             <p className="text-lg font-semibold text-gray-700">
               {queryParam ? 'Nenhum item encontrado' : 'Nenhum item disponível'}
             </p>
@@ -149,7 +149,7 @@ function MarketplaceContent() {
         )}
       </div>
 
-      <footer className="bg-[#0f1115] text-gray-600 text-center text-sm py-6 mt-16 border-t border-white/5">
+      <footer className="bg-[#0f1115] text-gray-600 text-center text-sm py-6 mt-auto border-t border-white/5">
         © {new Date().getFullYear()} Brasa Marketplace
       </footer>
     </div>
@@ -162,7 +162,7 @@ function ItemCard({ item }: { item: Item }) {
     <Link href={`/marketplace/${item.id}`} className="group">
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-200">
         <div className="relative h-44 bg-linear-to-br from-orange-50 to-amber-50 flex items-center justify-center">
-          <span className="text-5xl select-none">📦</span>
+          <Package className="w-14 h-14 text-orange-200" />
           {outOfStock && (
             <span className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
               Esgotado

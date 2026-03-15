@@ -1,10 +1,8 @@
 import { getToken } from '@/utils/auth';
 
-// In the browser, use the Next.js proxy (/api/*) to avoid CORS.
-// On the server (SSR), call the backend directly.
 const API_URL =
   typeof window === 'undefined'
-    ? process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+    ? process.env.NEXT_PUBLIC_API_URL
     : '/api';
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {

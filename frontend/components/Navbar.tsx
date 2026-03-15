@@ -3,15 +3,19 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import {
+  Search, Shield, LayoutDashboard, Package, ShoppingCart,
+  CreditCard, Landmark, User, LogOut, ChevronDown,
+} from 'lucide-react';
 import BrasaLogo from './BrasaLogo';
 import UserAvatar from './UserAvatar';
 import { getToken, getStoredUser, removeToken, parseJwt } from '@/utils/auth';
-import { User } from '@/types';
+import { User as UserType } from '@/types';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<Partial<User> | null>(null);
+  const [user, setUser] = useState<Partial<UserType> | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
@@ -19,8 +23,8 @@ export default function Navbar() {
   useEffect(() => {
     const token = getToken();
     if (!token) { setUser(null); return; }
-    const stored = getStoredUser<Partial<User>>();
-    setUser(stored ?? (parseJwt(token) as Partial<User>));
+    const stored = getStoredUser<Partial<UserType>>();
+    setUser(stored ?? (parseJwt(token) as Partial<UserType>));
   }, [pathname]);
 
   useEffect(() => {
@@ -39,7 +43,7 @@ export default function Navbar() {
     router.push('/');
   }
 
-  function handleSearch(e: React.FormEvent) {
+  function handleSearch(e: { preventDefault(): void }) {
     e.preventDefault();
     const q = search.trim();
     router.push(q ? `/marketplace?q=${encodeURIComponent(q)}` : '/marketplace');
@@ -51,12 +55,10 @@ export default function Navbar() {
     <nav className="bg-[#0f1115] text-white border-b border-white/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
 
-        {/* Logo */}
         <Link href={user ? '/marketplace' : '/'} className="shrink-0">
           <BrasaLogo size={26} textSize="text-lg" />
         </Link>
 
-        {/* Search bar — expands to fill space */}
         <form onSubmit={handleSearch} className="flex-1 max-w-xl">
           <div className="relative">
             <input
@@ -70,15 +72,11 @@ export default function Navbar() {
               type="submit"
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-400 transition"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-              </svg>
+              <Search className="w-4 h-4" />
             </button>
           </div>
         </form>
 
-        {/* Nav links */}
         <div className="hidden md:flex items-center gap-5 shrink-0">
           <NavLink href="/marketplace" label="Explorar" active={pathname === '/marketplace'} />
           {user && (
@@ -89,7 +87,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Auth zone */}
         <div className="shrink-0 flex items-center gap-2">
           {user ? (
             <div className="relative" ref={menuRef}>
@@ -98,12 +95,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-white/10 transition"
               >
                 <UserAvatar name={user.name} email={user.email} size="sm" />
-                <svg
-                  className={`w-3.5 h-3.5 text-gray-400 transition-transform hidden sm:block ${menuOpen ? 'rotate-180' : ''}`}
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform hidden sm:block ${menuOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {menuOpen && (
@@ -113,20 +105,20 @@ export default function Navbar() {
                     <p className="text-xs text-gray-400 truncate mt-0.5">{user.email}</p>
                   </div>
 
-                  {isAdmin && <DropItem href="/admin/dashboard" icon="🛡️" label="Painel Admin" onClick={() => setMenuOpen(false)} />}
-                  <DropItem href="/dashboard" icon="📊" label="Minha Conta" onClick={() => setMenuOpen(false)} />
-                  <DropItem href="/my-items" icon="📦" label="Meus Anúncios" onClick={() => setMenuOpen(false)} />
-                  <DropItem href="/sales" icon="🛒" label="Minhas Vendas" onClick={() => setMenuOpen(false)} />
-                  <DropItem href="/payments" icon="💳" label="Pagamentos" onClick={() => setMenuOpen(false)} />
-                  <DropItem href="/payment-methods" icon="🏦" label="Formas de Pagamento" onClick={() => setMenuOpen(false)} />
-                  <DropItem href="/profile" icon="👤" label="Meu Perfil" onClick={() => setMenuOpen(false)} />
+                  {isAdmin && <DropItem href="/admin/dashboard" icon={<Shield className="w-4 h-4" />} label="Painel Admin" onClick={() => setMenuOpen(false)} />}
+                  <DropItem href="/dashboard"        icon={<LayoutDashboard className="w-4 h-4" />} label="Minha Conta"        onClick={() => setMenuOpen(false)} />
+                  <DropItem href="/my-items"         icon={<Package className="w-4 h-4" />}         label="Meus Anúncios"      onClick={() => setMenuOpen(false)} />
+                  <DropItem href="/sales"            icon={<ShoppingCart className="w-4 h-4" />}    label="Minhas Vendas"      onClick={() => setMenuOpen(false)} />
+                  <DropItem href="/payments"         icon={<CreditCard className="w-4 h-4" />}      label="Pagamentos"         onClick={() => setMenuOpen(false)} />
+                  <DropItem href="/payment-methods"  icon={<Landmark className="w-4 h-4" />}        label="Formas de Pagamento" onClick={() => setMenuOpen(false)} />
+                  <DropItem href="/profile"          icon={<User className="w-4 h-4" />}            label="Meu Perfil"         onClick={() => setMenuOpen(false)} />
 
                   <hr className="my-1.5 border-gray-100" />
                   <button
                     onClick={logout}
                     className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 hover:bg-red-50 text-red-500 transition rounded-b-2xl"
                   >
-                    <span>↩</span> Sair
+                    <LogOut className="w-4 h-4 shrink-0" /> Sair
                   </button>
                 </div>
               )}
@@ -155,10 +147,10 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
   );
 }
 
-function DropItem({ href, icon, label, onClick }: { href: string; icon: string; label: string; onClick: () => void }) {
+function DropItem({ href, icon, label, onClick }: { href: string; icon: React.ReactNode; label: string; onClick: () => void }) {
   return (
-    <Link href={href} onClick={onClick} className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-gray-50 transition">
-      <span>{icon}</span><span>{label}</span>
+    <Link href={href} onClick={onClick} className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-gray-50 transition text-gray-500">
+      {icon}<span className="text-gray-700">{label}</span>
     </Link>
   );
 }

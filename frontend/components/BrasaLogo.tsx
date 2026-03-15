@@ -15,7 +15,7 @@ export default function BrasaLogo({
 }: Props) {
   return (
     <div className="flex items-center gap-2.5">
-      <Image src="/logo.svg" alt="Brasa" width={size} height={size} priority />
+      <Image src="/images/logo_brasa.svg" alt="Brasa" width={size} height={size} priority />
       {showText && (
         <div>
           <span className={`${textSize} font-bold text-gradient-brasa leading-none`}>Brasa</span>

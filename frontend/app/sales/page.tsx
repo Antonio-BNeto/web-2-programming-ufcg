@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { ShoppingCart, FileText, ShoppingBag } from 'lucide-react';
 import ShopLayout from '@/components/ShopLayout';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
@@ -39,21 +40,18 @@ export default function SalesPage() {
   const [error, setError] = useState('');
   const [availableItems, setAvailableItems] = useState<Item[]>([]);
 
-  // Create
   const [createOpen, setCreateOpen] = useState(false);
   const [createDesc, setCreateDesc] = useState('');
   const [saleItems, setSaleItems] = useState<SaleItemRequest[]>([{ itemId: 0, quantity: 1 }]);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState('');
 
-  // Edit
   const [editSale, setEditSale] = useState<Sale | null>(null);
   const [editDesc, setEditDesc] = useState('');
   const [editStatus, setEditStatus] = useState<SaleStatus>('NEGOTIATING');
   const [editNotes, setEditNotes] = useState('');
   const [editLoading, setEditLoading] = useState(false);
 
-  // Detail
   const [detailSale, setDetailSale] = useState<Sale | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
@@ -116,7 +114,6 @@ export default function SalesPage() {
       const full = await saleService.getById(sale.id);
       setDetailSale(full);
     } catch {
-      // keep original
     } finally {
       setDetailLoading(false);
     }
@@ -125,7 +122,6 @@ export default function SalesPage() {
   return (
     <ShopLayout wide>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Minhas Vendas</h1>
@@ -147,7 +143,9 @@ export default function SalesPage() {
           <LoadingSpinner />
         ) : sales.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-2xl border border-gray-100">
-            <p className="text-5xl mb-3">🛒</p>
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ShoppingCart className="w-8 h-8 text-gray-400" />
+            </div>
             <p className="text-lg font-semibold text-gray-700">Nenhuma venda ainda</p>
             <p className="text-sm text-gray-400 mt-1 mb-6">Compre um item no marketplace para iniciar uma venda.</p>
             <a href="/marketplace" className="btn-brasa px-6 py-2.5 rounded-xl text-sm">
@@ -163,7 +161,6 @@ export default function SalesPage() {
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>
 
-      {/* ── Create Modal ────────────────────────────────── */}
       <Modal open={createOpen} title="Nova Venda" onClose={() => setCreateOpen(false)} onConfirm={handleCreate} confirmLabel="Criar venda" loading={createLoading}>
         <div className="space-y-4">
           {createError && <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-3 py-2">{createError}</div>}
@@ -196,7 +193,6 @@ export default function SalesPage() {
         </div>
       </Modal>
 
-      {/* ── Edit Modal ──────────────────────────────────── */}
       <Modal open={!!editSale} title="Atualizar Venda" onClose={() => setEditSale(null)} onConfirm={handleEdit} confirmLabel="Salvar" loading={editLoading}>
         <div className="space-y-3">
           <div>
@@ -221,7 +217,6 @@ export default function SalesPage() {
         </div>
       </Modal>
 
-      {/* ── Detail Modal ────────────────────────────────── */}
       <Modal open={!!detailSale} title={`Venda #${detailSale?.id}`} onClose={() => setDetailSale(null)}>
         {detailSale && (
           detailLoading ? <LoadingSpinner /> : (
@@ -232,8 +227,9 @@ export default function SalesPage() {
               </div>
               <p className="text-gray-600">{detailSale.description}</p>
               {detailSale.agreementNotes && (
-                <div className="bg-yellow-50 border border-yellow-100 rounded-lg px-3 py-2 text-yellow-700 text-xs">
-                  📝 {detailSale.agreementNotes}
+                <div className="bg-yellow-50 border border-yellow-100 rounded-lg px-3 py-2 text-yellow-700 text-xs flex items-start gap-2">
+                  <FileText className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                  {detailSale.agreementNotes}
                 </div>
               )}
               {detailSale.SaleItems && detailSale.SaleItems.length > 0 && (
@@ -273,12 +269,16 @@ function SaleCard({ sale, onView, onEdit }: { sale: Sale; onView: () => void; on
           </div>
           <p className="text-sm font-medium text-gray-800 truncate">{sale.description}</p>
           {sale.SaleItems && sale.SaleItems.length > 0 && (
-            <p className="text-xs text-gray-400 mt-1 truncate">
-              🛍 {sale.SaleItems.map((si) => `${si.Item?.name ?? `Item #${si.itemId}`} (${si.quantity}x)`).join(' · ')}
+            <p className="text-xs text-gray-400 mt-1 truncate flex items-center gap-1">
+              <ShoppingBag className="w-3 h-3 shrink-0" />
+              {sale.SaleItems.map((si) => `${si.Item?.name ?? `Item #${si.itemId}`} (${si.quantity}x)`).join(' · ')}
             </p>
           )}
           {sale.agreementNotes && (
-            <p className="text-xs text-orange-500 mt-1 truncate">📝 {sale.agreementNotes}</p>
+            <p className="text-xs text-orange-500 mt-1 truncate flex items-center gap-1">
+              <FileText className="w-3 h-3 shrink-0" />
+              {sale.agreementNotes}
+            </p>
           )}
         </div>
         <div className="text-right shrink-0">

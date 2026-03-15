@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { PackageX, Package } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { itemService } from '@/services/itemService';
@@ -17,7 +18,6 @@ export default function ItemDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Purchase flow
   const [buyQty, setBuyQty] = useState(1);
   const [buying, setBuying] = useState(false);
   const [buyError, setBuyError] = useState('');
@@ -76,7 +76,9 @@ export default function ItemDetailPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <p className="text-5xl mb-4">😕</p>
+        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <PackageX className="w-10 h-10 text-gray-400" />
+        </div>
         <h2 className="text-xl font-semibold text-gray-700">{error || 'Item não encontrado'}</h2>
         <Link href="/marketplace" className="mt-6 inline-block btn-brasa px-6 py-2.5 rounded-lg">
           Voltar ao marketplace
@@ -88,11 +90,10 @@ export default function ItemDetailPage() {
   const outOfStock = item.quantity === 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        {/* Breadcrumb */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 flex-1">
         <nav className="text-sm text-gray-400 mb-6">
           <Link href="/marketplace" className="hover:text-orange-500 transition">Marketplace</Link>
           <span className="mx-2">›</span>
@@ -100,14 +101,12 @@ export default function ItemDetailPage() {
         </nav>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left: image placeholder */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="h-72 md:h-96 bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
-              <span className="text-8xl select-none">📦</span>
+            <div className="h-72 md:h-96 bg-linear-to-br from-orange-50 to-red-50 flex items-center justify-center">
+              <Package className="w-28 h-28 text-orange-200" />
             </div>
           </div>
 
-          {/* Right: details */}
           <div className="space-y-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{item.name}</h1>
@@ -149,7 +148,7 @@ export default function ItemDetailPage() {
                 <div className="text-center space-y-3">
                   <p className="text-sm text-gray-500">Este é um item seu.</p>
                   <Link
-                    href="/items"
+                    href="/my-items"
                     className="block w-full text-center border border-orange-500 text-orange-500 hover:bg-orange-50 py-2.5 rounded-lg text-sm font-medium transition"
                   >
                     Gerenciar meus itens
@@ -214,7 +213,7 @@ export default function ItemDetailPage() {
         </div>
       </div>
 
-      <footer className="bg-[#0f1115] text-gray-500 text-center text-sm py-6 mt-16 border-t border-white/10">
+      <footer className="bg-[#0f1115] text-gray-500 text-center text-sm py-6 mt-auto border-t border-white/10">
         © {new Date().getFullYear()} Brasa Marketplace — Todos os direitos reservados
       </footer>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { CreditCard } from 'lucide-react';
 import ShopLayout from '@/components/ShopLayout';
 import Modal from '@/components/Modal';
 import Pagination from '@/components/Pagination';
@@ -10,11 +11,9 @@ import { saleService } from '@/services/saleService';
 import { paymentMethodService } from '@/services/paymentMethodService';
 import { Payment, Sale, PaymentMethod, CreatePaymentRequest } from '@/types';
 
-const METHOD_ICON: Record<string, string> = { PIX: '⚡', CARD: '💳', BANK_ACCOUNT: '🏦' };
-
 function methodLabel(pm: PaymentMethod) {
-  if (pm.type === 'PIX') return `PIX — ${pm.Pix?.key ?? ''}`;
-  if (pm.type === 'CARD') return `Cartão — ${pm.Card?.holder_name ?? ''} **** ${pm.Card?.card_number?.slice(-4) ?? ''}`;
+  if (pm.type === 'PIX')          return `PIX — ${pm.Pix?.key ?? ''}`;
+  if (pm.type === 'CARD')         return `Cartão — ${pm.Card?.holder_name ?? ''} **** ${pm.Card?.card_number?.slice(-4) ?? ''}`;
   return `Conta bancária — ${pm.BankAccount?.bank_name ?? ''}`;
 }
 
@@ -110,7 +109,9 @@ export default function PaymentsPage() {
           <LoadingSpinner />
         ) : payments.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
-            <p className="text-4xl mb-3">💳</p>
+            <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <CreditCard className="w-7 h-7 text-gray-400" />
+            </div>
             <p className="font-semibold text-gray-700">Nenhum pagamento registrado</p>
             <p className="text-sm text-gray-400 mt-1">Registre um pagamento para uma venda existente.</p>
           </div>
@@ -123,7 +124,6 @@ export default function PaymentsPage() {
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>
 
-      {/* Create Modal */}
       <Modal open={createOpen} title="Registrar Pagamento" onClose={() => setCreateOpen(false)} onConfirm={handleCreate} confirmLabel="Registrar" loading={createLoading}>
         <div className="space-y-3">
           {createError && <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-3 py-2">{createError}</div>}
@@ -148,7 +148,6 @@ export default function PaymentsPage() {
         </div>
       </Modal>
 
-      {/* Delete Modal */}
       <Modal open={!!deletePayment} title="Excluir Pagamento" onClose={() => setDeletePayment(null)} onConfirm={handleDelete} confirmLabel="Excluir" confirmVariant="danger" loading={deleteLoading}>
         <p className="text-sm text-gray-700">Deseja remover o pagamento <strong>#{deletePayment?.id}</strong> de <strong>R$ {Number(deletePayment?.value ?? 0).toFixed(2)}</strong>? Esta ação não pode ser desfeita.</p>
       </Modal>
@@ -159,12 +158,11 @@ export default function PaymentsPage() {
 function PaymentRow({ payment, onDelete }: { payment: Payment; onDelete: () => void }) {
   const statusColor = payment.status === 'PAID' ? 'text-green-600 bg-green-50' : payment.status === 'PENDING' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-500 bg-gray-100';
   const statusLabel = payment.status === 'PAID' ? 'Pago' : payment.status === 'PENDING' ? 'Pendente' : 'Cancelado';
-  const methodType = payment.sale ? '' : '';
 
   return (
     <div className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition">
-      <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-xl shrink-0">
-        💳
+      <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+        <CreditCard className="w-5 h-5 text-orange-400" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900">Pagamento para Venda #{payment.saleId}</p>

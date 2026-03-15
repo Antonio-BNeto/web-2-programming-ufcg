@@ -96,8 +96,6 @@ export interface MessageResponse {
   message: string;
 }
 
-// ── Request types ──────────────────────────────────────────────
-
 export interface LoginRequest {
   email: string;
   password: string;

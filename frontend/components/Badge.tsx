@@ -24,8 +24,6 @@ export default function Badge({
   );
 }
 
-// ── Helpers ────────────────────────────────────────────────────
-
 export function saleStatusBadge(status: string) {
   const map: Record<string, { label: string; variant: Variant }> = {
     NEGOTIATING: { label: 'Negociando', variant: 'yellow' },

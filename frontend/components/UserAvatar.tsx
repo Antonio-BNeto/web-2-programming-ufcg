@@ -5,7 +5,6 @@ interface Props {
   className?: string;
 }
 
-/** Returns up to two initials: first letter of first name + first letter of last name. */
 export function getInitials(name?: string, email?: string): string {
   if (name?.trim()) {
     const parts = name.trim().split(/\s+/).filter(Boolean);

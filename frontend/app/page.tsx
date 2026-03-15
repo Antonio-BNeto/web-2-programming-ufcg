@@ -3,27 +3,28 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Store, DollarSign, ShieldCheck, CreditCard } from 'lucide-react';
 import { getToken } from '@/utils/auth';
 import BrasaLogo from '@/components/BrasaLogo';
 
 const features = [
   {
-    icon: '🏪',
+    Icon: Store,
     title: 'Compre de pessoas reais',
     description: 'Encontre produtos únicos vendidos por usuários como você, com preços justos e negociação direta.',
   },
   {
-    icon: '💰',
+    Icon: DollarSign,
     title: 'Venda o que não usa mais',
     description: 'Publique seus itens em segundos e alcance compradores interessados na sua região.',
   },
   {
-    icon: '🤝',
+    Icon: ShieldCheck,
     title: 'Negociação segura',
     description: 'Acompanhe cada etapa da venda, do acordo ao pagamento, tudo em um só lugar.',
   },
   {
-    icon: '💳',
+    Icon: CreditCard,
     title: 'Múltiplas formas de pagamento',
     description: 'Suporte a PIX, cartão e transferência bancária para facilitar suas transações.',
   },
@@ -44,8 +45,7 @@ export default function LandingPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-[#0f1115] text-white">
-      {/* ── Navbar ─────────────────────────────────────────── */}
+    <div className="min-h-screen flex flex-col bg-[#0f1115] text-white">
       <header className="sticky top-0 z-50 bg-[#0f1115]/95 backdrop-blur border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <BrasaLogo size={32} textSize="text-xl" />
@@ -63,9 +63,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* ── Hero ───────────────────────────────────────────── */}
       <section className="relative overflow-hidden py-24 px-4">
-        {/* Glow blobs */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -103,7 +101,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Features ───────────────────────────────────────── */}
       <section className="py-20 px-4 bg-white/3 border-t border-white/10">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
@@ -115,7 +112,9 @@ export default function LandingPage() {
                 key={f.title}
                 className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-orange-500/40 transition-colors"
               >
-                <div className="text-4xl mb-4">{f.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
+                  <f.Icon className="w-6 h-6 text-orange-400" />
+                </div>
                 <h3 className="font-semibold text-white mb-2">{f.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">{f.description}</p>
               </div>
@@ -124,7 +123,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── How it works ───────────────────────────────────── */}
       <section className="py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
@@ -144,7 +142,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CTA Banner ─────────────────────────────────────── */}
       <section className="py-20 px-4 bg-linear-to-r from-red-900/30 to-orange-900/30 border-t border-white/10">
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl font-extrabold">
@@ -154,24 +151,17 @@ export default function LandingPage() {
             Junte-se a milhares de pessoas que já compram e vendem no Brasa Marketplace.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/auth/register"
-              className="btn-brasa text-base px-8 py-3.5 rounded-xl font-semibold"
-            >
+            <Link href="/auth/register" className="btn-brasa text-base px-8 py-3.5 rounded-xl font-semibold">
               Criar conta grátis
             </Link>
-            <Link
-              href="/auth/login"
-              className="border border-white/20 text-white px-8 py-3.5 rounded-xl hover:bg-white/10 transition font-semibold"
-            >
+            <Link href="/auth/login" className="border border-white/20 text-white px-8 py-3.5 rounded-xl hover:bg-white/10 transition font-semibold">
               Já tenho conta
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────── */}
-      <footer className="border-t border-white/10 py-8 px-4 text-center text-gray-600 text-sm">
+      <footer className="border-t border-white/10 py-8 px-4 text-center text-gray-600 text-sm mt-auto">
         © {new Date().getFullYear()} Brasa Marketplace. Todos os direitos reservados.
       </footer>
     </div>
