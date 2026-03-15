@@ -1,0 +1,14 @@
+.payment-container {
+  width: 100%;
+  top: 0;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.payment-dropdown {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  box-sizing: border-box;
+}

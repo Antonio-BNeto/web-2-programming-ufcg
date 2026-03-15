@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Home from "../pages/Home"
-import Users from "../pages/Users"
+import Users from "../pages/UserProfile"
 import Items from "../pages/Items"
 import Sales from "../pages/Sales"
 import Payments from "../pages/Payments"
