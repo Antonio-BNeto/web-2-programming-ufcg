@@ -16,7 +16,7 @@ const startServer = async () => {
     await createDefaultAdmin();
     app.listen(PORT, () => {
       console.log(`🚀 Servidor rodando na porta ${PORT}`);
-      console.log(`📄 Swagger: http://localhost:${PORT}/api-docs`);
+      console.log(`📄 Swagger disponível em /api-docs na porta ${PORT}`);
     });
   } catch (err) {
     console.error('❌ Erro fatal ao iniciar aplicação:', err);

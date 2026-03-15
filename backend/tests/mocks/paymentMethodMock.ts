@@ -1,6 +1,3 @@
-import PaymentMethod from "@/models/PaymentMethod";
-
-// Mock para resposta de PIX
 export const mockPixMethodResponse = {
   id: 1,
   userId: 1,
@@ -13,7 +10,6 @@ export const mockPixMethodResponse = {
   }
 };
 
-// Mock para resposta de Cartão
 export const mockCardMethodResponse = {
   id: 2,
   userId: 1,
@@ -30,8 +26,6 @@ export const mockCardMethodResponse = {
   }
 };
 
-// Mock para resposta de Conta Bancária
-// tests/mocks/paymentMethodMock.ts
 export const mockBankMethodResponse = {
   id: 2,
   userId: 1,
@@ -45,10 +39,6 @@ export const mockBankMethodResponse = {
   }
 };
 
-/**
- * Helper para os testes de Service/Controller
- * Retorna o mock completo com o método toJSON simulado
- */
 export const mockPaymentMethodModel = (type: "PIX" | "CARD" | "BANK_ACCOUNT" = "PIX") => {
   const dataMap = {
     PIX: mockPixMethodResponse,

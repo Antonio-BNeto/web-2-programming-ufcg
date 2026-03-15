@@ -14,10 +14,7 @@ import { ErrorResponse } from "../types/responses";
 import { AppError } from "../errors/AppError";
 
 interface LoginRequest {
-  /** @example "usuario@email.com" */
   email: string;
-
-  /** @example "senhaSegura123" */
   password: string;
 }
 
@@ -30,12 +27,9 @@ interface LoginResponse {
 @Tags("Autenticação")
 export class AuthController extends Controller {
 
-  /**
-   * Realiza a autenticação do usuário e retorna um token JWT.
-   */
   @Post("login")
   @SuccessResponse(200, "Login efetuado com sucesso")
-  @Response<ErrorResponse>(400, "Credenciais inválidas")
+  @Response<ErrorResponse>(401, "Credenciais inválidas")
   @Response<ErrorResponse>(500, "Erro interno do servidor")
   public async login(
     @Body() body: LoginRequest
@@ -46,16 +40,16 @@ export class AuthController extends Controller {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      throw new AppError("E-mail ou senha inválidos.", 400);
+      throw new AppError("E-mail ou senha inválidos.", 401);
     }
 
     const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {
-      throw new AppError("E-mail ou senha inválidos.", 400);
+      throw new AppError("E-mail ou senha inválidos.", 401);
     }
 
-    const token = generateToken(user.id, user.email);
+    const token = generateToken(user.id, user.email, user.name, user.email, user.role);
 
     return {
       message: "Login successful",

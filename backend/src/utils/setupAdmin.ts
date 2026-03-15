@@ -15,12 +15,11 @@ export async function createDefaultAdmin() {
     return;
   }
 
+  const hashedPassword = await bcrypt.hash(ADMIN_DEFAULT_PASSWORD, 10);
+
   const adminExists = await User.findOne({ where: { email: ADMIN_DEFAULT_EMAIL } });
 
   if (!adminExists) {
-
-    const hashedPassword = await bcrypt.hash(ADMIN_DEFAULT_PASSWORD, 10);
-
     await User.create({
       name: ADMIN_DEFAULT_NAME || "Admin",
       email: ADMIN_DEFAULT_EMAIL,
@@ -29,5 +28,9 @@ export async function createDefaultAdmin() {
       phoneNumber: ADMIN_DEFAULT_PHONE || "00000000000",
       role: 'ADMIN'
     });
+    console.log("✅ Admin padrão criado com sucesso.");
+  } else {
+    await adminExists.update({ password: hashedPassword, role: 'ADMIN' });
+    console.log("🔄 Senha do admin sincronizada.");
   }
 }
