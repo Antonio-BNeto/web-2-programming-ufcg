@@ -5,18 +5,17 @@ import ProtectedLayout from "./layouts/ProtectedLayout"
 
 /* auth pages */
 import Login from "./pages/Login/Login"
-import RegisterUserPage from "./pages/RegisterUser/RegisterUserPage"
+import RegisterUserPage from "./pages/RegisterUserPage/RegisterUserPage"
 
 /* main pages */
 import MyItemsPage from "./pages/MyItems/MyItemsPage"
 import UserItemsPage from "./pages/UserItems/UserItemsPage"
-import MySalesPage from "./pages/MySales/MySalesPage"
+import MySalesPage from  "./pages/MySales/MySalesPage"
 import PaymentMethodsPage from "./pages/PaymentMethods/PaymentMethodsPage"
-import AccountSettingsPage from "./pages/AccountSettings/AccountSettingsPage"
+import AccountSettingsPage from  "./pages/AccountSettings/AccountSettingsPage"
 
 function App() {
   return (
-    <BrowserRouter>
 
       <Routes>
 
@@ -45,7 +44,6 @@ function App() {
 
       </Routes>
 
-    </BrowserRouter>
   )
 }
 

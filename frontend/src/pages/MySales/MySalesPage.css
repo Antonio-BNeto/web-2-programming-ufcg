@@ -1,0 +1,47 @@
+.my-sales-page {
+  padding-top: 100px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.sales-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.sale-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: white;
+}
+
+.sale-card h3 {
+  margin: 0;
+}
+
+.sale-price {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.sale-buyer {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.sale-date {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.sale-actions {
+  margin-top: 12px;
+}
+
+.sale-actions button {
+  padding: 6px 10px;
+  cursor: pointer;
+}
