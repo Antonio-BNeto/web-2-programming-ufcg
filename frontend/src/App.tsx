@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Routes, Route } from "react-router-dom"
 
 /* layouts */
 import ProtectedLayout from "./layouts/ProtectedLayout"
@@ -39,6 +39,7 @@ function App() {
           <Route path="/payment-methods" element={<PaymentMethodsPage />} />
 
           <Route path="/account-settings" element={<AccountSettingsPage />} />
+
 
         </Route>
 

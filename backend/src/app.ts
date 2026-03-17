@@ -22,4 +22,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   return res.status(status).json({ message: err.message || 'Erro interno do servidor' });
 });
 
+app.get('/swagger.json', (req, res) => {
+  res.json(swaggerDocument);
+});
+
 export default app;

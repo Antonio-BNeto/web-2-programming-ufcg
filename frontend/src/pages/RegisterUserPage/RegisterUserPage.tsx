@@ -1,10 +1,10 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { Link } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import logo from "../../assets/logo.png"
 
 import registerImage from "../../assets/registerUserImage.png"
 import "./RegisterUserPage.css"
+import { api } from "../../api"
 
 export default function RegisterUserPage() {
 
@@ -12,18 +12,47 @@ export default function RegisterUserPage() {
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [cpf, setCpf] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
 
   const navigate = useNavigate()
 
-  const handleRegister = (event: React.FormEvent) => {
+  const handleRegister = async (event: React.FormEvent) => {
     event.preventDefault()
+    setError("")
 
-    if (firstName && lastName && email && cpf) {
-      console.log("Usuário registrado")
+    try {
+      await api.createUser({
+        cpf,
+        phoneNumber,
+        name: `${firstName} ${lastName}`,
+        email,
+        password,
+      })
 
-      // futuramente aqui entrará a chamada da API
-
+      alert("Usuário cadastrado com sucesso!")
       navigate("/login")
+
+    } catch (err: any) {
+      console.error(err)
+
+      let message = "Erro ao cadastrar usuário"
+
+      if (err.response) {
+        // resposta do backend (caso ideal)
+        message =
+          err.response.data?.message ||
+          JSON.stringify(err.response.data)
+      } else if (err.request) {
+        // requisição feita mas sem resposta
+        message = "Servidor não respondeu"
+      } else {
+        // erro inesperado
+        message = err.message
+      }
+
+      setError(message)
     }
   }
 
@@ -70,7 +99,23 @@ export default function RegisterUserPage() {
             onChange={(e) => setCpf(e.target.value)}
           />
 
+          <input
+            type="text"
+            placeholder="Telefone"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
           <button type="submit">Cadastrar</button>
+
+          {error && <p className="error-message">{error}</p>}
 
           <Link to="/login">
             <button type="button" className="login-button">

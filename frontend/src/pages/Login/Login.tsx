@@ -4,20 +4,42 @@ import loginImage from "../../assets/loginImage.png"
 import logo from "../../assets/logo.png"
 import "./Login.css"
 import { Link } from "react-router-dom"
+import { api } from "../../api"
 
 export default function Login() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
 
   const navigate = useNavigate()
 
-  const handleLogin = (event: React.FormEvent) => {
+  const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault()
+    setError("")
 
-    if (email && password) {
-      localStorage.setItem("token", "fake-token")
+    try {
+      const response = await api.login({
+        email,
+        password,
+      })
+
+      const token = response.data.token
+
+      // salva token real
+      localStorage.setItem("token", token)
+
+      // redireciona após login
       navigate("/")
+
+    } catch (err: any) {
+      console.error(err)
+
+      if (err.response?.status === 401) {
+        setError("Email ou senha inválidos")
+      } else {
+        setError("Erro ao fazer login")
+      }
     }
   }
 
@@ -50,6 +72,8 @@ export default function Login() {
           />
 
           <button type="submit">Entrar</button>
+
+          {error && <p className="error-message">{error}</p>}
 
           <Link to="/register">
             <button type="button" className="register-button">
