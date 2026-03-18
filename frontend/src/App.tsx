@@ -1,13 +1,10 @@
 import { Routes, Route } from "react-router-dom"
 
-/* layouts */
 import ProtectedLayout from "./layouts/ProtectedLayout"
 
-/* auth pages */
 import Login from "./pages/Login/Login"
 import RegisterUserPage from "./pages/RegisterUserPage/RegisterUserPage"
 
-/* main pages */
 import MyItemsPage from "./pages/MyItems/MyItemsPage"
 import UserItemsPage from "./pages/UserItems/UserItemsPage"
 import MySalesPage from  "./pages/MySales/MySalesPage"
@@ -19,12 +16,10 @@ function App() {
 
       <Routes>
 
-        {/* páginas públicas */}
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterUserPage />} />
 
-        {/* páginas protegidas */}
 
         <Route element={<ProtectedLayout />}>
 

@@ -4,7 +4,6 @@ import logo from "../../assets/logo.png"
 
 import registerImage from "../../assets/registerUserImage.png"
 import "./RegisterUserPage.css"
-import { api } from "../../api"
 
 export default function RegisterUserPage() {
 
@@ -19,42 +18,47 @@ export default function RegisterUserPage() {
   const navigate = useNavigate()
 
   const handleRegister = async (event: React.FormEvent) => {
-    event.preventDefault()
-    setError("")
+  event.preventDefault()
+  setError("")
 
-    try {
-      await api.createUser({
+  try {
+    const response = await fetch("/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         cpf,
         phoneNumber,
         name: `${firstName} ${lastName}`,
         email,
         password,
-      })
+      }),
+    })
 
-      alert("Usuário cadastrado com sucesso!")
-      navigate("/login")
+    const data = await response.json().catch(() => null)
 
-    } catch (err: any) {
-      console.error(err)
+    console.log("STATUS:", response.status)
+    console.log("DATA:", data)
 
-      let message = "Erro ao cadastrar usuário"
-
-      if (err.response) {
-        // resposta do backend (caso ideal)
-        message =
-          err.response.data?.message ||
-          JSON.stringify(err.response.data)
-      } else if (err.request) {
-        // requisição feita mas sem resposta
-        message = "Servidor não respondeu"
-      } else {
-        // erro inesperado
-        message = err.message
-      }
+    if (!response.ok) {
+      const message =
+        data?.message ||
+        (typeof data === "string" ? data : null) ||
+        "Erro ao cadastrar usuário"
 
       setError(message)
+      return
     }
+
+    alert("Usuário cadastrado com sucesso!")
+    navigate("/login")
+
+  } catch (err: any) {
+    console.error("ERRO FETCH:", err)
+    setError("Erro de conexão com o servidor")
   }
+}
 
   return (
     <div className="register-page">

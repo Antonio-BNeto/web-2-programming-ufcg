@@ -1,10 +1,10 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import loginImage from "../../assets/loginImage.png"
 import logo from "../../assets/logo.png"
 import "./Login.css"
 import { Link } from "react-router-dom"
-import { api } from "../../api"
+import { authService } from "../../services/authService"
 
 export default function Login() {
 
@@ -12,35 +12,39 @@ export default function Login() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
+  const token = localStorage.getItem("token")
+
   const navigate = useNavigate()
 
   const handleLogin = async (event: React.FormEvent) => {
-    event.preventDefault()
-    setError("")
+  event.preventDefault()
+  setError("")
 
-    try {
-      const response = await api.login({
-        email,
-        password,
-      })
+  try {
+    const data = await authService.login({
+      email,
+      password,
+    })
 
-      const token = response.data.token
+    const token = data.token
 
-      // salva token real
-      localStorage.setItem("token", token)
+    localStorage.setItem("token", token)
 
-      // redireciona após login
-      navigate("/")
+    navigate("/")
 
-    } catch (err: any) {
-      console.error(err)
+  } catch (err: any) {
+    console.error(err)
 
-      if (err.response?.status === 401) {
-        setError("Email ou senha inválidos")
-      } else {
-        setError("Erro ao fazer login")
-      }
+    if (err.response?.status === 401) {
+      setError("Email ou senha inválidos")
+    } else {
+      setError("Erro ao fazer login")
     }
+  }
+}
+
+  if (token) {
+    return <Navigate to="/" />
   }
 
   return (

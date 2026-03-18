@@ -819,14 +819,21 @@
 	"paths": {
 		"/users": {
 			"post": {
-				"operationId": "CreateUser",
+				"operationId": "Create",
 				"responses": {
 					"201": {
 						"description": "Criado com sucesso",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/UserResponseDTO"
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/UserResponseDTO"
+										},
+										{
+											"$ref": "#/components/schemas/ErrorResponse"
+										}
+									]
 								}
 							}
 						}
@@ -859,7 +866,7 @@
 				}
 			},
 			"get": {
-				"operationId": "GetAllUsers",
+				"operationId": "GetAll",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1064,7 +1071,7 @@
 		},
 		"/sales": {
 			"post": {
-				"operationId": "CreateSale",
+				"operationId": "Create",
 				"responses": {
 					"201": {
 						"description": "Venda criada com sucesso",
@@ -1108,7 +1115,7 @@
 				}
 			},
 			"get": {
-				"operationId": "GetAllSales",
+				"operationId": "GetAll",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1370,7 +1377,7 @@
 		},
 		"/payment-methods": {
 			"post": {
-				"operationId": "CreatePaymentMethod",
+				"operationId": "Create",
 				"responses": {
 					"201": {
 						"description": "Criado com sucesso",
@@ -1523,7 +1530,7 @@
 		},
 		"/payments": {
 			"get": {
-				"operationId": "GetAllPayments",
+				"operationId": "GetAll",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1568,7 +1575,7 @@
 				]
 			},
 			"post": {
-				"operationId": "CreatePayment",
+				"operationId": "Create",
 				"responses": {
 					"201": {
 						"description": "Pagamento criado com sucesso",
@@ -1704,7 +1711,7 @@
 		},
 		"/items": {
 			"post": {
-				"operationId": "CreateItem",
+				"operationId": "Create",
 				"responses": {
 					"201": {
 						"description": "Criado com sucesso",
@@ -1748,7 +1755,7 @@
 				}
 			},
 			"get": {
-				"operationId": "GetAllItems",
+				"operationId": "GetAll",
 				"responses": {
 					"200": {
 						"description": "Ok",

@@ -14,10 +14,20 @@ export class UserController extends Controller {
   @Response<ErrorResponse>(400, "Erro de validação")
   public async create(
     @Body() requestBody: CreateUserDTO
-  ): Promise<UserResponseDTO> {
-    const user = await UserService.createUser(requestBody);
-    this.setStatus(201);
-    return user.get({ plain: true }) as UserResponseDTO;
+  ): Promise<UserResponseDTO | ErrorResponse> {
+    try {
+      const user = await UserService.createUser(requestBody);
+      this.setStatus(201);
+      return user.get({ plain: true }) as UserResponseDTO;
+    } catch (error: any) {
+      const status = error.statusCode || error.status || 500;
+
+      this.setStatus(status);
+
+      return {
+        message: error.message || "Erro interno do servidor",
+      };
+    }
   }
 
   @Get()
