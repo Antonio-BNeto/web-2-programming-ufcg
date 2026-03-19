@@ -1,85 +1,95 @@
-# 🛍️ Sistema de Vendas --- Backend
+# 🛍️ Sistema de Vendas --- Fullstack
 
 ## 📘 Visão Geral da Aplicação
 
 Este projeto implementa um **sistema completo de vendas**, composto por:
 
--   Cadastro de **usuários**
--   Cadastro de **itens**
--   Registro de **vendas**
--   Métodos de pagamento (Pix, Cartão, Conta)
--   Pagamentos vinculados à venda
--   *Avaliação* como atributo interno da venda (nota e comentário)
+* Cadastro de **usuários**
+* Cadastro de **itens**
+* Registro de **vendas**
+* Métodos de pagamento (Pix, Cartão, Conta)
+* Pagamentos vinculados à venda
+* *Avaliação* como atributo interno da venda (nota e comentário)
 
-A API foi construída usando:
+A aplicação é composta por:
 
--   **Node.js + Express**
--   **TypeScript**
--   **Sequelize**
--   **PostgreSQL**
--   **Swagger** (documentação automática)
--   **Docker** (ambiente completo e isolado)
+* **Backend**
 
-------------------------------------------------------------------------
+  * Node.js + Express
+  * TypeScript
+  * Sequelize
+  * PostgreSQL
+  * Swagger (documentação automática)
 
+* **Frontend**
+
+  * React
+  * Vite
+  * TypeScript
+
+* **Infraestrutura**
+
+  * Docker (para o backend e banco de dados)
+
+---
 
 ## 📦 Entidades Principais
 
 ### **Usuário**
 
--   id
--   cpf
--   nome
--   telefone
--   senha
--   email
+* id
+* cpf
+* nome
+* telefone
+* senha
+* email
 
 ### **Item**
 
--   id
--   nome
--   descricao
--   preco
+* id
+* nome
+* descricao
+* preco
 
 ### **Venda**
 
--   id
--   usuario_id
--   valor_total
--   descricao
--   nota_avaliacao
--   comentario_avaliacao
--   data_avaliacao
+* id
+* usuario_id
+* valor_total
+* descricao
+* nota_avaliacao
+* comentario_avaliacao
+* data_avaliacao
 
 ### **Pagamento**
 
--   id
--   venda_id
--   metodo_pagamento_id
--   status
--   data_pagamento
--   valor
+* id
+* venda_id
+* metodo_pagamento_id
+* status
+* data_pagamento
+* valor
 
 ### **Método de Pagamento**
 
--   id
--   usuario_id
--   tipo
--   principal
+* id
+* usuario_id
+* tipo
+* principal
 
 **Especializações:** Pix, Conta Bancária, Cartão
 
 ### **VENDA_ITEM**
 
--   venda_id
--   item_id
--   quantidade
+* venda_id
+* item_id
+* quantidade
 
-------------------------------------------------------------------------
+---
 
 ## 📊 Diagrama MER Atualizado
 
-``` mermaid
+```mermaid
 erDiagram
 
     USUARIO {
@@ -169,31 +179,37 @@ erDiagram
     METODO_PAGAMENTO ||--o{ PAGAMENTO : usado_em
 ```
 
-------------------------------------------------------------------------
+---
 
-# 🚀 Como Rodar a aplicação
+# 🚀 Como Rodar a Aplicação
 
-Este projeto funciona **totalmente via Docker**.
-Para executar, você precisa somente dos requisitos abaixo:
+A aplicação possui **frontend e backend separados**, mas pode ser executada de forma unificada.
 
 ---
 
-## ✅ 1. Instalar Docker
+## ✅ 1. Instalar dependências
 
-Você deve ser instalado:
+Antes de rodar o projeto, é necessário instalar as dependências **em ambas as partes**:
 
-- **Docker**
-- **Docker Compose** (já vem no Docker Desktop)
+### Backend
 
-Download: https://www.docker.com/get-started/
+```bash
+cd backend
+npm install
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+```
 
 ---
 
-## ✅ 2. Baixar o arquivo `.env`
+## ✅ 2. Configurar o `.env` (Backend)
 
-Copie as informações que estão no arquivo `.env` disponibilizado no Drive e coloque-o na **raiz do projeto**, assim:
-
-👉 [**Configuração do .env pelo Google Drive**](https://docs.google.com/document/d/1PLrrIzIwdUIcKQEADiq_qgLgyKe5YtGo/edit?usp=drive_link&ouid=109085909945120972414&rtpof=true&sd=true)
+Copie o `.env` disponibilizado e coloque na pasta `backend`:
 
 ```
 backend
@@ -203,29 +219,47 @@ backend
   |-src/
 ```
 
-Ele contém as variáveis necessárias para o backend conectar ao banco PostgreSQL.
-
 ---
 
-## ✅ 3. Rodar o projeto
-
-Execute:
+## ✅ 3. Subir o backend com Docker
 
 ```bash
+cd backend
 docker compose up --build -d
 ```
 
-O backend ficará disponível em:
+Backend disponível em:
 
 👉 http://localhost:3000
-
-Documentação Swagger:
+Swagger:
 
 👉 http://localhost:3000/api-docs
 
 ---
 
-## 🔄 Parar os containers
+## ✅ 4. Rodar frontend + backend juntos
+
+Na raiz do projeto:
+
+```
+web-2-programming-ufcg/
+```
+
+Execute:
+
+```bash
+npm run start-all
+```
+
+Esse comando irá:
+
+* Iniciar o **frontend**
+* Iniciar o **backend**
+* Evitar a necessidade de múltiplos terminais
+
+---
+
+## 🔄 Parar containers do backend
 
 ```bash
 docker compose down
@@ -240,47 +274,48 @@ docker compose down -v
 docker compose up --build -d
 ```
 
-
-------------------------------------------------------------------------
+---
 
 # 🧪 Como Executar os Testes
 
-Os testes são de integração e rodam **localmente**, sem necessidade do Docker.
-Eles utilizam mocks dos services, portanto **não é necessário ter o banco de dados rodando**.
+Os testes são de integração e rodam **no backend**.
 
 ---
 
 ## ✅ 1. Instalar dependências
 
-Caso ainda não tenha instalado:
 ```bash
+cd backend
 npm install
 ```
 
 ---
 
 ## ✅ 2. Rodar todos os testes
+
 ```bash
 npm run test
 ```
 
 ---
 
-## ✅ 3. Rodar um arquivo de teste específico
+## ✅ 3. Rodar teste específico
+
 ```bash
 npx jest tests/integration/item.test.ts
 ```
 
 ---
 
-## ✅ 4. Rodar com cobertura de código
+## ✅ 4. Cobertura de código
+
 ```bash
 npx jest --coverage
 ```
 
-------------------------------------------------------------------------
+---
 
 # 👨‍💻 Autores
 
--   Antonio Barros de Alcantara Neto
--   Paulo Ricardo Oliveira de Macêdo
+* Antonio Barros de Alcantara Neto
+* Paulo Ricardo Oliveira de Macêdo
