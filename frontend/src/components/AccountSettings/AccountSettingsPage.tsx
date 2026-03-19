@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import "./AccountSettingsPage.css"
+import "./accountSettingsPage.css"
 import { userService } from "../../services/userService"
 
 export default function AccountSettingsPage() {
