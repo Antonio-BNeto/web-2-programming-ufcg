@@ -10,18 +10,34 @@ export default function AccountSettingsPage() {
   const [cpf, setCpf] = useState("")
   const [error, setError] = useState("")
 
-  // ⚠️ ajuste temporário (ideal: pegar do token depois)
-  const userId = 1
+  const getUserIdFromToken = (): number | null => {
+    const token = localStorage.getItem("token")
+    if (!token) return null
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]))
+      return payload.id
+    } catch (err) {
+      console.error("Erro ao decodificar token:", err)
+      return null
+    }
+  }
 
   useEffect(() => {
-    loadUser()
+    const userId = getUserIdFromToken()
+
+    if (!userId) {
+      setError("Usuário não autenticado")
+      return
+    }
+
+    loadUser(userId)
   }, [])
 
-  const loadUser = async () => {
+  const loadUser = async (userId: number) => {
     try {
       const user = await userService.getById(userId)
 
-      // backend retorna "name" → separar em nome + sobrenome
       const [first, ...rest] = user.name.split(" ")
 
       setFirstName(first || "")
@@ -39,12 +55,19 @@ export default function AccountSettingsPage() {
     event.preventDefault()
     setError("")
 
+    const userId = getUserIdFromToken()
+
+    if (!userId) {
+      setError("Usuário não autenticado")
+      return
+    }
+
     try {
       await userService.update(userId, {
         name: `${firstName} ${lastName}`,
         email,
-        phoneNumber: "", // ⚠️ backend exige? ajustar depois
-        password: ""     // ⚠️ opcional dependendo da API
+        phoneNumber: "",
+        password: ""
       })
 
       alert("Configurações salvas com sucesso!")

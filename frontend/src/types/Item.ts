@@ -1,18 +1,21 @@
 export interface CreateItemDTO {
   name: string
+  description: string
   price: number
-  stock: number
+  quantity?: number
 }
 
 export interface UpdateItemDTO {
   name?: string
+  description?: string
   price?: number
-  stock?: number
+  quantity?: number
 }
 
 export interface ItemResponseDTO {
   id: number
   name: string
+  description: string
   price: number
-  stock: number
+  quantity: number
 }
