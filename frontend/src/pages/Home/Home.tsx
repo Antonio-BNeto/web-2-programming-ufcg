@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { itemService } from "../../services/itemService"
-import "./Home.css"
+import "./home.css"
 
 export default function Home() {
 

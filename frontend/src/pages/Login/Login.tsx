@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import loginImage from "../../assets/loginImage.png"
 import logo from "../../assets/logo.png"
-import "./Login.css"
+import "./login.css"
 import { Link } from "react-router-dom"
 import { authService } from "../../services/authService"
 
