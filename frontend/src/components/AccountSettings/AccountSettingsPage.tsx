@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import "./AccountSettingsPage.css"
+import { userService } from "../../services/userService"
 
 export default function AccountSettingsPage() {
 
@@ -7,20 +8,51 @@ export default function AccountSettingsPage() {
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [cpf, setCpf] = useState("")
+  const [error, setError] = useState("")
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
+  // ⚠️ ajuste temporário (ideal: pegar do token depois)
+  const userId = 1
 
-    const updatedUser = {
-      firstName,
-      lastName,
-      email,
-      cpf
+  useEffect(() => {
+    loadUser()
+  }, [])
+
+  const loadUser = async () => {
+    try {
+      const user = await userService.getById(userId)
+
+      // backend retorna "name" → separar em nome + sobrenome
+      const [first, ...rest] = user.name.split(" ")
+
+      setFirstName(first || "")
+      setLastName(rest.join(" ") || "")
+      setEmail(user.email)
+      setCpf(user.cpf)
+
+    } catch (err) {
+      console.error(err)
+      setError("Erro ao carregar dados do usuário")
     }
+  }
 
-    console.log("Updated user data:", updatedUser)
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    setError("")
 
-    alert("Configurações salvas (simulação)")
+    try {
+      await userService.update(userId, {
+        name: `${firstName} ${lastName}`,
+        email,
+        phoneNumber: "", // ⚠️ backend exige? ajustar depois
+        password: ""     // ⚠️ opcional dependendo da API
+      })
+
+      alert("Configurações salvas com sucesso!")
+
+    } catch (err: any) {
+      console.error(err)
+      setError("Erro ao salvar alterações")
+    }
   }
 
   return (
@@ -65,6 +97,8 @@ export default function AccountSettingsPage() {
         <button type="submit">
           Salvar alterações
         </button>
+
+        {error && <p className="error-message">{error}</p>}
 
       </form>
 

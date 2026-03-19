@@ -5,11 +5,8 @@ import ProtectedLayout from "./layouts/ProtectedLayout"
 import Login from "./pages/Login/Login"
 import RegisterUserPage from "./pages/RegisterUserPage/RegisterUserPage"
 
-import MyItemsPage from "./pages/MyItems/MyItemsPage"
-import UserItemsPage from "./pages/UserItems/UserItemsPage"
-import MySalesPage from  "./pages/MySales/MySalesPage"
-import PaymentMethodsPage from "./pages/PaymentMethods/PaymentMethodsPage"
-import AccountSettingsPage from  "./pages/AccountSettings/AccountSettingsPage"
+import Home from "./pages/Home/Home"
+import Dashboard from "./pages/Dashboard/Dashboard"
 
 function App() {
   return (
@@ -23,18 +20,12 @@ function App() {
 
         <Route element={<ProtectedLayout />}>
 
-          <Route path="/" element={<MyItemsPage />} />
+          <Route path="/" element={<Home />} />
 
-          <Route path="/my-items" element={<MyItemsPage />} />
-
-          <Route path="/users/:userId/items" element={<UserItemsPage />} />
-
-          <Route path="/my-sales" element={<MySalesPage />} />
-
-          <Route path="/payment-methods" element={<PaymentMethodsPage />} />
-
-          <Route path="/account-settings" element={<AccountSettingsPage />} />
-
+          <Route path="/my-items" element={<Dashboard />} />
+          <Route path="/my-sales" element={<Dashboard />} />
+          <Route path="/payment-methods" element={<Dashboard />} />
+          <Route path="/account-settings" element={<Dashboard />} />
 
         </Route>
 
